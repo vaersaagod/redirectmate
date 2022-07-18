@@ -1,0 +1,44 @@
+{
+    "name": "vaersaagod/redirectmate",
+    "description": "Let's politely redirect your URLs, mate!",
+    "type": "craft-plugin",
+    "version": "1.0.0-beta.1",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "redirect",
+        "404"
+    ],
+    "support": {
+        "docs": "https://github.com/vaersaagod/redirectmate/blob/master/README.md",
+        "issues": "https://github.com/vaersaagod/redirectmate/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Værsågod",
+            "homepage": "https://www.vaersaagod.no"
+        }
+    ],
+    "require": {
+        "php": "^8.0.2",
+        "craftcms/cms": "^4.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "vaersaagod\\redirectmate\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "RedirectMate",
+        "handle": "redirectmate",
+        "hasCpSettings": false,
+        "hasCpSection": false,
+        "changelogUrl": "https://raw.githubusercontent.com/vaersaagod/redirectmate/master/CHANGELOG.md",
+        "components": {
+        },
+        "class": "vaersaagod\\redirectmate\\RedirectMate"
+    }
+}

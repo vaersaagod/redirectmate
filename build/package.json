@@ -1,0 +1,29 @@
+{
+  "name": "redirectmate-assets",
+  "version": "1.0.0",
+  "license": "MIT",
+  "source": "src/redirectmate.js",
+  "scripts": {
+    "start": "parcel watch --dist-dir ../src/assetbundles/dist src/redirectmate.js",
+    "build": "parcel build --dist-dir ../src/assetbundles/dist && tailwindcss -i ./src/css/redirectmate_tailwind.css -o ../src/assetbundles/dist/redirectmate_tailwind.css",
+    "tw": "tailwindcss -i ./src/css/redirectmate_tailwind.css -o ../src/assetbundles/dist/redirectmate_tailwind.css --watch"
+  },
+  "dependencies": {
+    "@parcel/transformer-vue": "^2.6.2",
+    "axios": "^0.27.0",
+    "craftcms-sass": "^3.4.0",
+    "isbot": "^3.5.0",
+    "qs": "^6.11.0",
+    "ua-parser-js": "^1.0.2",
+    "vue": "^3.2.37"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "2.6.2",
+    "buffer": "^6.0.3",
+    "parcel": "^2.6.2",
+    "postcss": "^8.4.14",
+    "process": "^0.11.10",
+    "sass": "^1.23.3",
+    "tailwindcss": "^3.1.4"
+  }
+}

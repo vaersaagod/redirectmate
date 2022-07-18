@@ -1,0 +1,41 @@
+{# @var settings \vaersaagod\redirectmate\models\Settings #}
+
+<div class="redirectmate-utility" id="redirectMateApp" v-cloak>
+    <header id="content-header" class="pane-header">
+        <div class="pane-tabs">
+            <div class="" role="tablist" aria-label="Primary fields">
+                <a id="tab-tab--log" :class="{ sel: activeTab == 'log' }" @click.prevent="activeTab = 'log'" href="#tab--log" tabindex="0" role="tab" data-id="tab--log" aria-controls="tab--log" aria-selected="true">
+                    <span class="tab-label">Log</span>
+                </a>
+                <a id="tab-tab--redirects" :class="{ sel: activeTab == 'redirects' }" @click.prevent="activeTab = 'redirects'" href="#tab--redirects" tabindex="-1" role="tab" data-id="tab--redirects" aria-controls="tab--redirects" aria-selected="false">
+                    <span class="tab-label">Redirects</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <log-view v-if="activeTab === 'log'"></log-view>
+    <redirects-view v-if="activeTab === 'redirects'"></redirects-view>
+</div>
+
+{% set sites = craft.app.getSites().getAllSites() %}
+{% set sitesArr = sites|map((value, key) => { id: value.id, handle: value.handle, name: value.name, baseUrl: value.baseUrl }) %}
+
+{% js at head %}
+    window.redirectMate = {
+        csrfToken: "{{ craft.app.request.csrfToken }}",
+        sites: {{ sitesArr|json_encode|raw }},
+        i18n: {
+        
+        },
+        actions: {
+            getRedirects: "{{ actionUrl('redirectmate/cp/get-redirects') }}",
+            addRedirect: "{{ actionUrl('redirectmate/cp/add-redirect') }}",
+            deleteRedirects: "{{ actionUrl('redirectmate/cp/delete-redirects') }}",
+            getLogs: "{{ actionUrl('redirectmate/cp/get-logs') }}",
+            checkLogItem: "{{ actionUrl('redirectmate/cp/check-log-item') }}",
+            deleteLogItems: "{{ actionUrl('redirectmate/cp/delete-log-items') }}",
+            deleteAllLogItems: "{{ actionUrl('redirectmate/cp/delete-all-log-items') }}",
+        }
+    };
+{% endjs %}

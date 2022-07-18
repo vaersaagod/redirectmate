@@ -1,0 +1,45 @@
+@import "../../node_modules/craftcms-sass/mixins";
+
+[v-cloak] {
+    display: none;
+}
+
+.redirectmate-utility {
+    .checkbox-column {
+        width: 30px !important;
+    }
+
+    .modal-footer {
+        box-shadow: 0 0 0 1px #cdd8e4, 0 2px 12px rgb(205 216 228 / 50%);
+        background-color: #f3f7fc;
+        padding: 18px;
+    }
+
+    .icon.delete:before {
+        top: -1px;
+    }
+
+    .icon.search:before {
+        top: -2px;
+        position: relative;
+    }
+
+    .icon.add:before {
+        top: 1px;
+    }
+
+    .status-dot {
+        transition-property: transform, opacity;
+        transition-duration: 0.5s;
+        transition-timing-function: ease-in-out;
+    }
+
+    .status-dot.is-checking {
+        transform: scale(0.4);
+        opacity: 0.5;
+    }
+
+    .modal-box-shadow {
+        box-shadow: 0 25px 100px rgb(31 41 51 / 50%);
+    }
+}
