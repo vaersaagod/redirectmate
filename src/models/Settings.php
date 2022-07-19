@@ -50,6 +50,13 @@ class Settings extends Model
      * The array can either be a flat array of patterns, or a nested array where the
      * keys are site handles, or '*' for all sites, and the value is an array of
      * patterns.
+     * 
+     * '^/excluded' matches all parsed paths starting with "/exlcuded" 
+     * '^/excluded/' matches all parsed paths starting with "/exlcuded/", but not "/excluded" itself 
+     * '/excluded/' matches all parsed paths that contains a segment "/exlcuded/"
+     * 'excluded' matches all parsed paths that contains a the string "exlcuded"
+     *
+     * All matches are case insensitive (/i is automatically added)
      *
      * @var array
      */
@@ -65,5 +72,31 @@ class Settings extends Model
     public function rules(): array
     {
         return [];
+    }
+
+    public function getParsedExcludeUrlPatterns($siteHandle): array
+    {
+        return $this->getLocalizedConfigSetting('excludeUrlPatterns', $siteHandle);
+    }
+    
+    public function getLocalizedConfigSetting(string $name, string $siteHandle = null): mixed
+    {
+        if ($siteHandle === null) {
+            try {
+                $siteHandle = \Craft::$app->getSites()->getCurrentSite()->handle;
+            } catch (\Throwable) {
+                return $this->$name;
+            }
+        }
+        
+        if (is_array($this->$name) && array_key_exists($siteHandle, $this->$name)) {
+            return $this->$name[$siteHandle];
+        }
+        
+        if (is_array($this->$name) && array_key_exists('*', $this->$name)) {
+            return $this->$name['*'];
+        }
+        
+        return $this->$name;
     }
 }
