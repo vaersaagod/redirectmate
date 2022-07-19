@@ -94,8 +94,7 @@ class RedirectHelper
             // Do not log, it's ok.
         }
     }
-
-
+    
     /**
      * @param RedirectModel $model
      *

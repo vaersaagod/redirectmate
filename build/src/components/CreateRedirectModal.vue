@@ -132,6 +132,9 @@ export default {
         save() {
             this.doSave('save')
         },
+        saveAndAdd() {
+            this.doSave('saveAndAdd')
+        },
         saveAndContinue() {
             this.doSave('saveAndContinue')
         },
@@ -154,6 +157,9 @@ export default {
                     
                     if (saveMode === 'save') {
                         this.closeCallback();
+                    } else if (saveMode === 'saveAndAdd') {
+                        this.editId = null;
+                        this.updateCurrent();
                     } else {
                         this.processCurrent();
                         this.nextItem();
@@ -273,10 +279,11 @@ export default {
                 <div class="flex justify-end">
                     <button type="button" @click.prevent="cancel" class="btn">Cancel</button>
                     
-                    <button type="submit" v-if="this.mode != 'batch'" @click.prevent="save" class="btn submit">Save</button>
+                    <button type="submit" v-if="this.mode != 'batch'" @click.prevent="save" class="btn submit">Create</button>
+                    <button type="submit" v-if="this.mode != 'batch'" @click.prevent="saveAndAdd" class="btn submit">Create and add another</button>
                     
                     <button type="button" v-if="this.mode === 'batch'" @click.prevent="skip" class="btn">Skip</button>
-                    <button type="submit" v-if="this.mode === 'batch'" @click.prevent="saveAndContinue" class="btn submit">Save and continue</button>
+                    <button type="submit" v-if="this.mode === 'batch'" @click.prevent="saveAndContinue" class="btn submit">Create and continue</button>
                 </div>
             </div>
             

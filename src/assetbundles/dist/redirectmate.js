@@ -5710,6 +5710,9 @@ exports.default = {
         save () {
             this.doSave("save");
         },
+        saveAndAdd () {
+            this.doSave("saveAndAdd");
+        },
         saveAndContinue () {
             this.doSave("saveAndContinue");
         },
@@ -5725,7 +5728,10 @@ exports.default = {
             }).then(({ data  })=>{
                 console.log(data);
                 if (saveMode === "save") this.closeCallback();
-                else {
+                else if (saveMode === "saveAndAdd") {
+                    this.editId = null;
+                    this.updateCurrent();
+                } else {
                     this.processCurrent();
                     this.nextItem();
                 }
@@ -5908,11 +5914,11 @@ const _hoisted_42 = /*#__PURE__*/ (0, _vue.createElementVNode)("p", null, "No mo
 function render(_ctx, _cache, $props, $setup, $data, $options) {
     return $props.isVisible ? ((0, _vue.openBlock)(), (0, _vue.createElementBlock)("div", {
         key: 0,
-        onClick: _cache[13] || (_cache[13] = ($event)=>$props.closeCallback()),
+        onClick: _cache[14] || (_cache[14] = ($event)=>$props.closeCallback()),
         class: "fixed full flex justify-center modal-shade z-99 flex"
     }, [
         (0, _vue.createElementVNode)("form", {
-            onClick: _cache[12] || (_cache[12] = (0, _vue.withModifiers)(()=>{}, [
+            onClick: _cache[13] || (_cache[13] = (0, _vue.withModifiers)(()=>{}, [
                 "stop"
             ])),
             class: "relative flex flex-col bg-white justify-between w-[calc(100%-16px)] max-w-[750px] rounded-5px overflow-hidden modal-box-shadow"
@@ -6059,30 +6065,38 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                             "prevent"
                         ])),
                         class: "btn submit"
-                    }, "Save")) : (0, _vue.createCommentVNode)("v-if", true),
-                    this.mode === "batch" ? ((0, _vue.openBlock)(), (0, _vue.createElementBlock)("button", {
+                    }, "Create")) : (0, _vue.createCommentVNode)("v-if", true),
+                    this.mode != "batch" ? ((0, _vue.openBlock)(), (0, _vue.createElementBlock)("button", {
                         key: 1,
+                        type: "submit",
+                        onClick: _cache[9] || (_cache[9] = (0, _vue.withModifiers)((...args)=>$options.saveAndAdd && $options.saveAndAdd(...args), [
+                            "prevent"
+                        ])),
+                        class: "btn submit"
+                    }, "Create and add another")) : (0, _vue.createCommentVNode)("v-if", true),
+                    this.mode === "batch" ? ((0, _vue.openBlock)(), (0, _vue.createElementBlock)("button", {
+                        key: 2,
                         type: "button",
-                        onClick: _cache[9] || (_cache[9] = (0, _vue.withModifiers)((...args)=>$options.skip && $options.skip(...args), [
+                        onClick: _cache[10] || (_cache[10] = (0, _vue.withModifiers)((...args)=>$options.skip && $options.skip(...args), [
                             "prevent"
                         ])),
                         class: "btn"
                     }, "Skip")) : (0, _vue.createCommentVNode)("v-if", true),
                     this.mode === "batch" ? ((0, _vue.openBlock)(), (0, _vue.createElementBlock)("button", {
-                        key: 2,
+                        key: 3,
                         type: "submit",
-                        onClick: _cache[10] || (_cache[10] = (0, _vue.withModifiers)((...args)=>$options.saveAndContinue && $options.saveAndContinue(...args), [
+                        onClick: _cache[11] || (_cache[11] = (0, _vue.withModifiers)((...args)=>$options.saveAndContinue && $options.saveAndContinue(...args), [
                             "prevent"
                         ])),
                         class: "btn submit"
-                    }, "Save and continue")) : (0, _vue.createCommentVNode)("v-if", true)
+                    }, "Create and continue")) : (0, _vue.createCommentVNode)("v-if", true)
                 ])
             ]),
             $data.isAtEnd ? ((0, _vue.openBlock)(), (0, _vue.createElementBlock)("div", _hoisted_40, [
                 (0, _vue.createElementVNode)("div", _hoisted_41, [
                     _hoisted_42,
                     (0, _vue.createElementVNode)("button", {
-                        onClick: _cache[11] || (_cache[11] = (0, _vue.withModifiers)((...args)=>$options.cancel && $options.cancel(...args), [
+                        onClick: _cache[12] || (_cache[12] = (0, _vue.withModifiers)((...args)=>$options.cancel && $options.cancel(...args), [
                             "prevent"
                         ])),
                         class: "btn submit"
