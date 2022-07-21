@@ -44,8 +44,15 @@ class RedirectService extends Component
             }
         }
         
+        // Do final parsing of destination URL
+        $destinationUrl = $redirect->destinationUrl;
+
+        if (RedirectMate::getInstance()?->getSettings()->queryStringPassthrough && !empty(Craft::$app->getRequest()->getQueryString())) {
+            $destinationUrl .= '?' . Craft::$app->getRequest()->getQueryString();
+        }
+        
         // Redirect
-        $response->redirect($redirect->destinationUrl, $redirect->statusCode)->send();
+        $response->redirect($destinationUrl, $redirect->statusCode)->send();
 
         try {
             Craft::$app->end();
