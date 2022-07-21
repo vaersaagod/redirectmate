@@ -59,8 +59,13 @@ class RedirectHelper
         $query = (new Query())
             ->from(['{{%redirectmate_redirects}}'])
             ->orderBy(new Expression('FIELD (sourceUrl, \''.implode('\',\'', $urlPatterns).'\')'))
-            ->where(['siteId' => $site->id])
-            ->orWhere(['siteId' => null])
+            ->where([
+                'or', [
+                    'siteId' => $site->id,
+                ], [
+                    'siteId' => null,
+                ]
+            ])
             ->andWhere(['sourceUrl' => $urlPatterns])
             ->andWhere(['isRegexp' => false]);
 
@@ -73,8 +78,13 @@ class RedirectHelper
         $query = (new Query())
             ->from(['{{%redirectmate_redirects}}'])
             ->orderBy('dateCreated DESC')
-            ->where(['siteId' => $site->id])
-            ->orWhere(['siteId' => null])
+            ->where([
+                'or', [
+                    'siteId' => $site->id,
+                ], [
+                    'siteId' => null,
+                ]
+            ])
             ->andWhere(['isRegexp' => true]);
 
         $reqexpRecords = $query->all();
@@ -87,7 +97,7 @@ class RedirectHelper
             } else {
                 $target = $parsedUrlModel->parsedUrl;
             }
-            
+
             $pattern = '`'.$redirectModel->sourceUrl.'`i';
 
             try {
