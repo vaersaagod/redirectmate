@@ -67,6 +67,7 @@ export default {
         },
         closeModal() {
             this.activeModal = false;
+            this.modalEditId = null;
             this.loadItems();
         },
         batchDeleteItems() {

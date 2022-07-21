@@ -14,11 +14,12 @@ export default {
         return {
             isLoading: false,
             isAtEnd: false,
+            currentEditId: null,
             message: {
                 isError: false,
                 text: '',
             },
-            
+
             currentData: {
                 logId: '',
                 site: 'all',
@@ -28,7 +29,7 @@ export default {
                 matchAs: 'exact',
                 statusCode: '301',
             },
-            
+
             dataDefaults: {
                 logId: '',
                 site: 'all',
@@ -48,9 +49,11 @@ export default {
                 this.isAtEnd = false;
                 this.processedIds = [];
 
+                this.currentEditId = this.editId;
+
                 this.$nextTick(() => {
                     this.updateCurrent();
-                    
+
                     if (this.currentData.sourceUrl === '') {
                         this.$refs.sourceUrlInput.focus();
                     } else {
@@ -70,6 +73,7 @@ export default {
             });
         },
         resetCurrentData() {
+            this.currentData.id = null;
             this.currentData.logId = this.dataDefaults.logId;
             this.currentData.site = this.dataDefaults.site;
             this.currentData.sourceUrl = this.dataDefaults.sourceUrl;
@@ -86,26 +90,26 @@ export default {
         },
         updateCurrent() {
             this.resetCurrentData();
-            
+
             this.currentData.site = this.parentSelectedSite;
-            
-            const currentItem = this.editId !== null ? this.getItemWithId(this.editId) : this.getNextItem();
-            
+
+            const currentItem = this.currentEditId !== null ? this.getItemWithId(this.currentEditId) : this.getNextItem();
+
             if (currentItem === undefined) {
                 return false;
             }
-            
+
             this.currentData.logId = currentItem.id;
             this.currentData.sourceUrl = currentItem.sourceUrl;
             this.currentData.site = !currentItem.siteId ? 'all' : currentItem.siteId;
 
-            if (this.mode === 'edit' && this.editId !== null) {
+            if (this.mode === 'edit' && this.currentEditId !== null) {
                 this.currentData.matchBy = currentItem.matchBy;
                 this.currentData.destinationUrl = currentItem.destinationUrl;
                 this.currentData.matchAs = currentItem.isRegexp ? 'regexp' : 'exact';
                 this.currentData.statusCode = currentItem.statusCode;
             }
-            
+
             return true;
         },
         processCurrent() {
@@ -138,27 +142,27 @@ export default {
         saveAndContinue() {
             this.doSave('saveAndContinue')
         },
-        
+
         doSave(saveMode) {
             console.log(window.redirectMate.actions.addRedirect);
             this.message.isError = false;
             this.message.text = '';
             this.isLoading = true;
-            
+
             const data = this.currentData;
-            
-            if (this.mode === 'edit' && this.editId !== null) {
-                data.id = this.editId;
+
+            if (this.mode === 'edit' && this.currentEditId !== null) {
+                data.id = this.currentEditId;
             }
-            
+
             this.$axios.post(window.redirectMate.actions.addRedirect, { redirectData: this.currentData })
                 .then(({ data }) => {
                     console.log(data);
-                    
+
                     if (saveMode === 'save') {
                         this.closeCallback();
                     } else if (saveMode === 'saveAndAdd') {
-                        this.editId = null;
+                        this.currentEditId = null;
                         this.updateCurrent();
                     } else {
                         this.processCurrent();
@@ -181,7 +185,7 @@ export default {
             if (e.keyCode === 27) {
                 if (this.isVisible) {
                     this.cancel();
-                }  
+                }
             }
         });
     }
@@ -275,18 +279,18 @@ export default {
                     <div :class="{ 'text-red-500': message.isError }">{{ message.text }}</div>
                     <div ref="spinner" class="spinner block w-24px h-24px" :style="{ opacity: isLoading ? 1 : 0 }"></div>
                 </div>
-                
+
                 <div class="flex justify-end">
                     <button type="button" @click.prevent="cancel" class="btn">Cancel</button>
-                    
-                    <button type="submit" v-if="this.mode != 'batch'" @click.prevent="save" class="btn submit">Create</button>
-                    <button type="submit" v-if="this.mode != 'batch'" @click.prevent="saveAndAdd" class="btn submit">Create and add another</button>
-                    
+
+                    <button type="submit" v-if="this.mode != 'batch'" @click.prevent="save" class="btn submit">Save</button>
+                    <button type="submit" v-if="this.mode != 'batch'" @click.prevent="saveAndAdd" class="btn submit">Save and add another</button>
+
                     <button type="button" v-if="this.mode === 'batch'" @click.prevent="skip" class="btn">Skip</button>
                     <button type="submit" v-if="this.mode === 'batch'" @click.prevent="saveAndContinue" class="btn submit">Create and continue</button>
                 </div>
             </div>
-            
+
             <div class="absolute full bg-white bg-opacity-95 z-2 p-40 flex justify-center" v-if="isAtEnd">
                 <div class="text-center w-100">
                     <p>No more unhandled errors!</p>

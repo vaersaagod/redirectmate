@@ -5614,6 +5614,7 @@ exports.default = {
         return {
             isLoading: false,
             isAtEnd: false,
+            currentEditId: null,
             message: {
                 isError: false,
                 text: ""
@@ -5644,6 +5645,7 @@ exports.default = {
             if (newStatus === true) {
                 this.isAtEnd = false;
                 this.processedIds = [];
+                this.currentEditId = this.editId;
                 this.$nextTick(()=>{
                     this.updateCurrent();
                     if (this.currentData.sourceUrl === "") this.$refs.sourceUrlInput.focus();
@@ -5662,6 +5664,7 @@ exports.default = {
             });
         },
         resetCurrentData () {
+            this.currentData.id = null;
             this.currentData.logId = this.dataDefaults.logId;
             this.currentData.site = this.dataDefaults.site;
             this.currentData.sourceUrl = this.dataDefaults.sourceUrl;
@@ -5679,12 +5682,12 @@ exports.default = {
         updateCurrent () {
             this.resetCurrentData();
             this.currentData.site = this.parentSelectedSite;
-            const currentItem = this.editId !== null ? this.getItemWithId(this.editId) : this.getNextItem();
+            const currentItem = this.currentEditId !== null ? this.getItemWithId(this.currentEditId) : this.getNextItem();
             if (currentItem === undefined) return false;
             this.currentData.logId = currentItem.id;
             this.currentData.sourceUrl = currentItem.sourceUrl;
             this.currentData.site = !currentItem.siteId ? "all" : currentItem.siteId;
-            if (this.mode === "edit" && this.editId !== null) {
+            if (this.mode === "edit" && this.currentEditId !== null) {
                 this.currentData.matchBy = currentItem.matchBy;
                 this.currentData.destinationUrl = currentItem.destinationUrl;
                 this.currentData.matchAs = currentItem.isRegexp ? "regexp" : "exact";
@@ -5722,14 +5725,14 @@ exports.default = {
             this.message.text = "";
             this.isLoading = true;
             const data1 = this.currentData;
-            if (this.mode === "edit" && this.editId !== null) data1.id = this.editId;
+            if (this.mode === "edit" && this.currentEditId !== null) data1.id = this.currentEditId;
             this.$axios.post(window.redirectMate.actions.addRedirect, {
                 redirectData: this.currentData
             }).then(({ data  })=>{
                 console.log(data);
                 if (saveMode === "save") this.closeCallback();
                 else if (saveMode === "saveAndAdd") {
-                    this.editId = null;
+                    this.currentEditId = null;
                     this.updateCurrent();
                 } else {
                     this.processCurrent();
@@ -6065,7 +6068,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                             "prevent"
                         ])),
                         class: "btn submit"
-                    }, "Create")) : (0, _vue.createCommentVNode)("v-if", true),
+                    }, "Save")) : (0, _vue.createCommentVNode)("v-if", true),
                     this.mode != "batch" ? ((0, _vue.openBlock)(), (0, _vue.createElementBlock)("button", {
                         key: 1,
                         type: "submit",
@@ -6073,7 +6076,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                             "prevent"
                         ])),
                         class: "btn submit"
-                    }, "Create and add another")) : (0, _vue.createCommentVNode)("v-if", true),
+                    }, "Save and add another")) : (0, _vue.createCommentVNode)("v-if", true),
                     this.mode === "batch" ? ((0, _vue.openBlock)(), (0, _vue.createElementBlock)("button", {
                         key: 2,
                         type: "button",
@@ -22514,6 +22517,7 @@ exports.default = {
         },
         closeModal () {
             this.activeModal = false;
+            this.modalEditId = null;
             this.loadItems();
         },
         batchDeleteItems () {
