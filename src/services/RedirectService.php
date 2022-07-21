@@ -6,6 +6,7 @@ use Craft;
 use craft\base\Component;
 use craft\db\Query;
 use vaersaagod\redirectmate\helpers\RedirectHelper;
+use vaersaagod\redirectmate\helpers\UrlHelper;
 use vaersaagod\redirectmate\models\RedirectModel;
 use vaersaagod\redirectmate\RedirectMate;
 
@@ -20,9 +21,11 @@ use vaersaagod\redirectmate\RedirectMate;
  */
 class RedirectService extends Component
 {
-    
+
     /**
      * @param RedirectModel $redirect
+     *
+     * @throws \yii\base\Exception
      */
     public function doRedirect(RedirectModel $redirect): void
     {
@@ -45,10 +48,12 @@ class RedirectService extends Component
         }
         
         // Do final parsing of destination URL
-        $destinationUrl = $redirect->destinationUrl;
-
+        $siteId = $redirect->siteId ?? Craft::$app->getSites()->getCurrentSite()->siteId ?? null;
+        
         if (RedirectMate::getInstance()?->getSettings()->queryStringPassthrough && !empty(Craft::$app->getRequest()->getQueryString())) {
-            $destinationUrl .= '?' . Craft::$app->getRequest()->getQueryString();
+            $destinationUrl = UrlHelper::siteUrl($redirect->destinationUrl, Craft::$app->getRequest()->getQueryString(), null, $siteId);
+        } else {
+            $destinationUrl = UrlHelper::siteUrl($redirect->destinationUrl, null, null, $siteId);
         }
         
         // Redirect

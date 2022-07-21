@@ -25,6 +25,8 @@ class TrackerService extends Component
 
     /**
      * @param null $request
+     *
+     * @throws \yii\base\InvalidConfigException
      */
     public function handleRequest($request = null): void
     {
@@ -57,7 +59,7 @@ class TrackerService extends Component
 
         // Get redirect
         $redirect = RedirectHelper::getRedirectForUrlAndSite($parsedUrl, $currentSite);
-
+        
         if ($redirect === null) {
             $trackerModel->handled = false;
             TrackerHelper::insertOrUpdateData($trackerModel->getAttributes());

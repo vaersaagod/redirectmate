@@ -18,6 +18,7 @@ class UrlHelper extends CraftUrlHelper
      * @param Request $request
      *
      * @return ParsedUrlModel
+     * @throws \yii\base\InvalidConfigException
      */
     public static function parseRequestUrl(Request $request): ParsedUrlModel
     {
@@ -25,7 +26,7 @@ class UrlHelper extends CraftUrlHelper
 
         $urlModel = new ParsedUrlModel();
         $urlModel->url = $urlModel->parsedUrl = self::stripQueryString($request->getAbsoluteUrl());
-        $urlModel->path = $urlModel->parsedPath = '/'.$request->getFullPath();
+        $urlModel->path = $urlModel->parsedPath = '/'.$request->getPathInfo();
         $urlModel->queryString = urldecode($request->getQueryStringWithoutPath());
 
         $queryStringParams = $request->getQueryParams();
