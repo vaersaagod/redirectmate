@@ -47,7 +47,7 @@ class TrackerService extends Component
         if ($this->shouldExclude($parsedUrl, $currentSite->handle)) {
             return;
         }
-        
+
         // Get the tracking data
         $trackerModel = TrackerHelper::getOrCreateModel($parsedUrl->parsedPath, $currentSite);
 
@@ -58,8 +58,13 @@ class TrackerService extends Component
         }
 
         // Get redirect
-        $redirect = RedirectHelper::getRedirectForUrlAndSite($parsedUrl, $currentSite);
-        
+        try {
+            $redirect = RedirectHelper::getRedirectForUrlAndSite($parsedUrl, $currentSite);
+        } catch (\Throwable $throwable) {
+            Craft::error('An error occured when trying to get redirect: '.$throwable->getMessage());
+            $redirect = null;
+        }
+
         if ($redirect === null) {
             $trackerModel->handled = false;
             TrackerHelper::insertOrUpdateData($trackerModel->getAttributes());
@@ -69,7 +74,6 @@ class TrackerService extends Component
 
         $trackerModel->handled = true;
         TrackerHelper::insertOrUpdateData($trackerModel->getAttributes());
-
         RedirectMate::getInstance()->redirect->doRedirect($redirect);
     }
 
@@ -91,7 +95,7 @@ class TrackerService extends Component
                 }
             }
         }
-        
+
         return false;
     }
 }

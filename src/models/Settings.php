@@ -21,6 +21,13 @@ class Settings extends Model
     public string $pluginName = 'RedirectMate';
 
     /**
+     * Whether or not to cache resolved redirects 
+     * 
+     * @var bool 
+     */
+    public bool $cacheEnabled = false;
+    
+    /**
      * Whether to track and keep the query string when a 404 is triggered.
      *
      * Can be either a boolean, or an array of whitelisted params that will be kept. 

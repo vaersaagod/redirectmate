@@ -4,6 +4,7 @@ namespace vaersaagod\redirectmate\services;
 
 use Craft;
 use craft\base\Component;
+use vaersaagod\redirectmate\helpers\CacheHelper;
 use vaersaagod\redirectmate\helpers\RedirectHelper;
 use vaersaagod\redirectmate\helpers\UrlHelper;
 use vaersaagod\redirectmate\models\RedirectModel;
@@ -25,7 +26,7 @@ class RedirectService extends Component
         $statusCode = $redirect->statusCode;
         
         RedirectHelper::updateRedirectStats($redirect);
-
+        
         // If we have an status code above 400, trigger an exception and let Craft handle it.
         if ($statusCode >= 400) {
             RedirectMate::$currentException->statusCode = $statusCode;
@@ -104,6 +105,9 @@ class RedirectService extends Component
                 Craft::error('An error occured when trying to delete potential redirect loop redirects: ', $e->getMessage(), __METHOD__);
             }
         }
+        
+        // Invalidate caches
+        CacheHelper::invalidateAllCaches();
 
         // Insert or update redirect and return.
         return RedirectHelper::insertOrUpdateData($model);
