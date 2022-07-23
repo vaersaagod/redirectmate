@@ -8,7 +8,6 @@ use vaersaagod\redirectmate\helpers\RedirectHelper;
 use vaersaagod\redirectmate\helpers\UrlHelper;
 use vaersaagod\redirectmate\models\RedirectModel;
 use vaersaagod\redirectmate\RedirectMate;
-use yii\base\Exception;
 
 /**
  * RedirectService Service
@@ -20,19 +19,14 @@ use yii\base\Exception;
 class RedirectService extends Component
 {
 
-    /**
-     * @param RedirectModel $redirect
-     *
-     * @throws Exception
-     */
     public function doRedirect(RedirectModel $redirect): void
     {
         $response = Craft::$app->getResponse();
         $statusCode = $redirect->statusCode;
-
+        
         RedirectHelper::updateRedirectStats($redirect);
 
-        // If we have an status code above 400, we want to trigger an exception
+        // If we have an status code above 400, trigger an exception and let Craft handle it.
         if ($statusCode >= 400) {
             RedirectMate::$currentException->statusCode = $statusCode;
             $errorHandler = Craft::$app->getErrorHandler();
@@ -111,6 +105,7 @@ class RedirectService extends Component
             }
         }
 
+        // Insert or update redirect and return.
         return RedirectHelper::insertOrUpdateData($model);
     }
 

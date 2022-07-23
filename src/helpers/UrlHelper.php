@@ -2,6 +2,7 @@
 
 namespace vaersaagod\redirectmate\helpers;
 
+use craft\helpers\FileHelper;
 use craft\helpers\UrlHelper as CraftUrlHelper;
 use craft\web\Request;
 
@@ -25,8 +26,8 @@ class UrlHelper extends CraftUrlHelper
         $settings = RedirectMate::$plugin->getSettings();
 
         $urlModel = new ParsedUrlModel();
-        $urlModel->url = $urlModel->parsedUrl = self::stripQueryString($request->getAbsoluteUrl());
-        $urlModel->path = $urlModel->parsedPath = '/'.$request->getPathInfo();
+        $urlModel->url = $urlModel->parsedUrl = self::normalizeUrl(self::stripQueryString($request->getAbsoluteUrl()));
+        $urlModel->path = $urlModel->parsedPath = self::normalizeUrl($request->getPathInfo());
         $urlModel->queryString = urldecode($request->getQueryStringWithoutPath());
 
         $queryStringParams = $request->getQueryParams();
@@ -67,5 +68,30 @@ class UrlHelper extends CraftUrlHelper
         curl_close($ch);
 
         return $httpcode;
+    }
+
+    /**
+     * Overrides the internal normalizePath
+     *
+     * @param string $pathOrUrl
+     *
+     * @return string
+     */
+    public static function normalizeUrl(string $pathOrUrl): string
+    {
+        $addTrailingSlashes = \Craft::$app->getConfig()->getGeneral()->addTrailingSlashesToUrls;
+
+        if (self::isUrl($pathOrUrl)) {
+            $r = rtrim($pathOrUrl, '/');
+        } else {
+            $r = FileHelper::normalizePath('/'.ltrim($pathOrUrl, '/'), '/');
+        }
+
+        return $r.($addTrailingSlashes ? '/' : '');
+    }
+
+    public static function isUrl(string $url): bool
+    {
+        return self::isAbsoluteUrl($url) || self::isProtocolRelativeUrl($url);
     }
 }

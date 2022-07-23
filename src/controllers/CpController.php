@@ -165,8 +165,8 @@ class CpController extends Controller
         
         $redirectModel->siteId = $data['site'] === 'all' ? null : (int)$data['site'];
         $redirectModel->matchBy = $data['matchBy'] === RedirectModel::MATCHBY_FULLURL ? RedirectModel::MATCHBY_FULLURL : RedirectModel::MATCHBY_PATH;
-        $redirectModel->sourceUrl = $data['sourceUrl'];
-        $redirectModel->destinationUrl = $data['destinationUrl'];
+        $redirectModel->sourceUrl = UrlHelper::normalizeUrl($data['sourceUrl']);
+        $redirectModel->destinationUrl = UrlHelper::isUrl($data['destinationUrl']) ? $data['destinationUrl'] : UrlHelper::normalizeUrl($data['destinationUrl']);
         $redirectModel->isRegexp = $data['matchAs'] === 'regexp';
         $redirectModel->statusCode = $data['statusCode'];
         
