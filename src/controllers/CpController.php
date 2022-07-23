@@ -8,6 +8,7 @@ use vaersaagod\redirectmate\helpers\TrackerHelper;
 use vaersaagod\redirectmate\helpers\UrlHelper;
 use vaersaagod\redirectmate\models\RedirectModel;
 use vaersaagod\redirectmate\models\TrackerModel;
+use vaersaagod\redirectmate\RedirectMate;
 use yii\web\Response;
 
 
@@ -173,7 +174,7 @@ class CpController extends Controller
             return $this->asFailure(\Craft::t('redirectmate', 'Validation failed'), $redirectModel->getErrors());
         } 
         
-        $result = RedirectHelper::insertOrUpdateData($redirectModel);
+        $result = RedirectMate::getInstance()->redirect->addRedirect($redirectModel);
         
         if ($result->hasErrors()) {
             return $this->asFailure(\Craft::t('redirectmate', 'An error occured when saving.'), $result->getErrors());
