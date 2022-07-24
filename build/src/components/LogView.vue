@@ -151,7 +151,7 @@ export default {
             return `${uaParsed.getBrowser().name} ${uaParsed.getBrowser().major} / ${uaParsed.getOS().name} ${uaParsed.getOS().version}`;
         },
         getItemSourceUrl(item) {
-            const site = this.sites.find( ({ id }) => id === item.siteId );
+            const site = this.sites.find( ({ id }) => id === parseInt(item.siteId, 10));
             return this.Craft.getUrl(item.sourceUrl, null, site.baseUrl);
         }
     },

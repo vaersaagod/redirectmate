@@ -394,7 +394,7 @@ module.exports = {
                     '100': 'rgb(63, 77, 90)'
                 },
             },
-            
+
             // Custom easing
             transitionTimingFunction: {
                 'in-cubic': 'cubic-bezier(0.550, 0.055, 0.675, 0.190)',

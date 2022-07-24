@@ -1,4 +1,8 @@
-@import "../../node_modules/craftcms-sass/mixins";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "../node_modules/craftcms-sass/mixins";
 
 [v-cloak] {
     display: none;
@@ -43,3 +47,4 @@
         box-shadow: 0 25px 100px rgb(31 41 51 / 50%);
     }
 }
+

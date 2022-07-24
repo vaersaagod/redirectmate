@@ -6,14 +6,14 @@ import LogView from './components/LogView.vue';
 import RedirectsView from './components/RedirectsView.vue';
 import CreateRedirectModal from './components/CreateRedirectModal.vue';
 
-import './css/redirectmate.scss';
+import './redirectmate.scss';
 
 if (process.env.NODE_ENV === "development") {
-   globalThis.__VUE_OPTIONS_API__ = true
-   globalThis.__VUE_PROD_DEVTOOLS__ = true;
+    globalThis.__VUE_OPTIONS_API__ = true
+    globalThis.__VUE_PROD_DEVTOOLS__ = true;
 } else {
-   globalThis.__VUE_OPTIONS_API__ = true;
-   globalThis.__VUE_PROD_DEVTOOLS__ = false;
+    globalThis.__VUE_OPTIONS_API__ = true;
+    globalThis.__VUE_PROD_DEVTOOLS__ = false;
 }
 
 const axiosInstance = axios.create({
@@ -40,7 +40,7 @@ const app = createApp({
         }
     },
     methods: {
-        
+
     },
     mounted() {
     },

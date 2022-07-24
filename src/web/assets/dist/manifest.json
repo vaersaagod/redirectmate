@@ -1,0 +1,14 @@
+{
+  "src/redirectmate.js": {
+    "file": "redirectmate.js",
+    "src": "src/redirectmate.js",
+    "isEntry": true,
+    "css": [
+      "redirectmate.css"
+    ]
+  },
+  "src/redirectmate.css": {
+    "file": "redirectmate.css",
+    "src": "src/redirectmate.css"
+  }
+}

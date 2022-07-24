@@ -1,29 +1,27 @@
 {
-  "name": "redirectmate-assets",
-  "version": "1.0.0",
-  "license": "MIT",
-  "source": "src/redirectmate.js",
+  "name": "redirectmate",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
   "scripts": {
-    "start": "parcel watch --dist-dir ../src/assetbundles/dist src/redirectmate.js",
-    "build": "parcel build --dist-dir ../src/assetbundles/dist && tailwindcss -i ./src/css/redirectmate_tailwind.css -o ../src/assetbundles/dist/redirectmate_tailwind.css",
-    "tw": "tailwindcss -i ./src/css/redirectmate_tailwind.css -o ../src/assetbundles/dist/redirectmate_tailwind.css --watch"
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@parcel/transformer-vue": "^2.6.2",
-    "axios": "^0.27.0",
-    "craftcms-sass": "^3.4.0",
+    "axios": "^0.27.2",
+    "craftcms-sass": "^3.5.7",
     "isbot": "^3.5.0",
+    "postcss": "^8.4.14",
     "qs": "^6.11.0",
     "ua-parser-js": "^1.0.2",
     "vue": "^3.2.37"
   },
   "devDependencies": {
-    "@parcel/transformer-sass": "2.6.2",
-    "buffer": "^6.0.3",
-    "parcel": "^2.6.2",
-    "postcss": "^8.4.14",
-    "process": "^0.11.10",
-    "sass": "^1.23.3",
-    "tailwindcss": "^3.1.4"
+    "@vitejs/plugin-vue": "^3.0.0",
+    "autoprefixer": "^10.4.7",
+    "sass": "^1.54.0",
+    "tailwindcss": "^3.1.6",
+    "vite": "^3.0.0"
   }
 }

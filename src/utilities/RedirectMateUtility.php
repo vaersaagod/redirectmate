@@ -4,8 +4,10 @@ namespace vaersaagod\redirectmate\utilities;
 
 use Craft;
 use craft\base\Utility;
-use vaersaagod\redirectmate\assetbundles\RedirectMateAssets;
+
 use vaersaagod\redirectmate\RedirectMate;
+use vaersaagod\redirectmate\web\assets\RedirectMateAsset;
+
 use yii\base\InvalidConfigException;
 
 /**
@@ -58,11 +60,11 @@ class RedirectMateUtility extends Utility
     public static function contentHtml(): string
     {
         $settings = RedirectMate::$plugin->getSettings();
-        
+
         try {
-            Craft::$app->getView()->registerAssetBundle(RedirectMateAssets::class);
+            Craft::$app->getView()->registerAssetBundle(RedirectMateAsset::class);
         } catch (InvalidConfigException) {
-            return Craft::t('redirectmate', 'Could not load asset bundle');
+            return Craft::t('redirectmate', 'Could not register asset bundle');
         }
         
         return Craft::$app->getView()->renderTemplate(
