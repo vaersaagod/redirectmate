@@ -5,10 +5,12 @@ namespace vaersaagod\redirectmate\web\assets;
 use Craft;
 use craft\helpers\App;
 use craft\helpers\FileHelper;
-use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
+
+use GuzzleHttp\Client;
+
 use Dotenv\Dotenv;
 
 class RedirectMateAsset extends AssetBundle
@@ -33,14 +35,14 @@ class RedirectMateAsset extends AssetBundle
         'redirectmate.css',
     ];
 
-    /** @var array|null */
-    private ?array $_envVars = null;
-
     /** @var string|null */
-    private ?string $_devServer = null;
+    private ?string $_devServerUrl = null;
 
     /** @var bool|null */
     private ?bool $_isDevServerRunning = null;
+
+    /** @var array|null */
+    private ?array $_envVars = null;
 
     /**
      * @inheritDoc
@@ -50,44 +52,34 @@ class RedirectMateAsset extends AssetBundle
         parent::init();
 
         if (App::devMode() && $this->_isDevServerRunning()) {
-            $this->js = array_map([$this, '_prependDevServer'], $this->js);
-            $this->css = array_map([$this, '_prependDevServer'], $this->css);
+
+            // Prepend the Vite dev server's URL to relative JS resources
+            $this->js = array_map([$this, '_prependDevServerUrl'], $this->js);
+
+            // Remove relative CSS resources as they are served from Vite's dev server
+            $this->css = array_filter($this->css, function (array|string $filePath) {
+                if (is_array($filePath)) {
+                    $filePath = $filePath[0];
+                }
+                return UrlHelper::isFullUrl($filePath);
+            });
         }
     }
 
     /**
-     * @return array
-     */
-    private function _getEnvVars(): array
-    {
-        if ($this->_envVars === null) {
-            $envFile = FileHelper::normalizePath(App::parseEnv('@vaersaagod/redirectmate') . '/../.env');
-            if (
-                class_exists('Dotenv\Dotenv') &&
-                file_exists($envFile) &&
-                !is_dir($envFile) &&
-                $envFileContents = (file_exists($envFile) ? @file_get_contents($envFile) : '')
-            ) {
-                $this->_envVars = Dotenv::parse($envFileContents);
-            } else {
-                $this->_envVars = [];
-            }
-        }
-        return $this->_envVars;
-    }
-
-    /**
+     * Prepends the dev server's URL to a resource file path
+     *
      * @param array|string $filePath
      * @return array|string
      */
-    private function _prependDevServer(array|string $filePath): array|string
+    private function _prependDevServerUrl(array|string $filePath): array|string
     {
         if (is_array($filePath)) {
             $fileArray = $filePath;
             $filePath = $fileArray[0] ?? '';
         }
         if ($filePath && !UrlHelper::isFullUrl($filePath)) {
-            $devServer = $this->_getDevServer();
+            $devServer = $this->_getDevServerUrl();
             $filePath = $devServer . '/' . ltrim($filePath, '/');
         }
         if (isset($fileArray)) {
@@ -98,16 +90,18 @@ class RedirectMateAsset extends AssetBundle
     }
 
     /**
+     * Checks if the dev server is running
+     *
      * @return bool
      */
     private function _isDevServerRunning(): bool
     {
         if ($this->_isDevServerRunning === null) {
-            $devServer = $this->_getDevServer();
+            $devServerUrl = $this->_getDevServerUrl();
             try {
-                Craft::createGuzzleClient([
+                (new Client([
                     'http_errors' => false,
-                ])->get($devServer);
+                ]))->get($devServerUrl);
                 $this->_isDevServerRunning = true;
             } catch (\Throwable) {
                 $this->_isDevServerRunning = false;
@@ -117,20 +111,45 @@ class RedirectMateAsset extends AssetBundle
     }
 
     /**
+     * Returns the URL to the dev server
+     *
      * @return string
      */
-    private function _getDevServer(): string
+    private function _getDevServerUrl(): string
     {
-        if ($this->_devServer === null) {
+        if ($this->_devServerUrl === null) {
             $envVars = $this->_getEnvVars();
             $devServerHost = $envVars['VITE_DEVSERVER_HOST'] ?? 'localhost';
             if ($devServerHost === '0.0.0.0') {
                 $devServerHost = 'localhost';
             }
             $devServerPort = $envVars['VITE_DEVSERVER_PORT'] ?? '3000';
-            $this->_devServer = "http://$devServerHost:$devServerPort/src";
+            $this->_devServerUrl = "http://$devServerHost:$devServerPort/src";
         }
-        return $this->_devServer;
+        return $this->_devServerUrl;
+    }
+
+    /**
+     * Returns an array of env vars from a .env file in the plugin's root folder
+     *
+     * @return array
+     */
+    private function _getEnvVars(): array
+    {
+        if ($this->_envVars === null) {
+            $envFile = FileHelper::normalizePath(App::parseEnv('@vaersaagod/redirectmate') . '/../.env');
+            if (
+                class_exists('Dotenv\Dotenv') &&
+                file_exists($envFile) &&
+                !is_dir($envFile) &&
+                $envFileContents = (file_exists($envFile) ? @file_get_contents($envFile) : null)
+            ) {
+                $this->_envVars = Dotenv::parse($envFileContents);
+            } else {
+                $this->_envVars = [];
+            }
+        }
+        return $this->_envVars;
     }
 
 }
