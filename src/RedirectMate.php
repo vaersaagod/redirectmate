@@ -33,9 +33,9 @@ use vaersaagod\redirectmate\utilities\RedirectMateUtility;
  * @package   vaersaagod\redirectmate
  * @since     1.0.0
  *
- * @property  TrackerService    $tracker
- * @property  RedirectService   $redirect
- * @property  Settings          $settings
+ * @property  TrackerService $tracker
+ * @property  RedirectService $redirect
+ * @property  Settings $settings
  * @method    Settings          getSettings()
  */
 class RedirectMate extends Plugin
@@ -79,43 +79,38 @@ class RedirectMate extends Plugin
             ),
         ]);
 
-        if ($this->tableSchemaExists()) {
-            $request = Craft::$app->getRequest();
-
-            // Handle errors
-            if ($request->getIsSiteRequest() && $request->method === 'GET' && !$request->getIsActionRequest() && !$request->getIsPreview() && !$request->getIsLivePreview()) {
-                Event::on(ErrorHandler::class, ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION,
-                    static function(ExceptionEvent $e) {
-                        $exception = $e->exception;
-
-                        if ($exception instanceof HttpException && $exception->statusCode === 404) {
-                            self::$currentException = $exception;
-                            self::getInstance()->tracker->handleRequest();
-                        }
-                    });
+        // Add utility
+        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
+            static function (RegisterComponentTypesEvent $event) {
+                $event->types[] = RedirectMateUtility::class;
             }
+        );
 
-            // Add utility
-            Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
-                static function(RegisterComponentTypesEvent $event) {
-                    $event->types[] = RedirectMateUtility::class;
-                }
-            );
+        // Handle front-end 404 exceptions
+        $request = Craft::$app->getRequest();
+        if ($request->getIsSiteRequest() && $request->method === 'GET' && !$request->getIsActionRequest() && !$request->getIsPreview() && !$request->getIsLivePreview()) {
+            Event::on(ErrorHandler::class, ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION,
+                static function (ExceptionEvent $e) {
+                    $exception = $e->exception;
+                    if ($exception instanceof \Twig\Error\RuntimeError && ($previousException = $exception->getPrevious()) !== null) {
+                        // Use the previous exception in the case of a Twig Runtime exception
+                        $exception = $previousException;
+                    }
+                    if (!$exception instanceof HttpException || $exception->statusCode !== 404) {
+                        return;
+                    }
+                    static::$currentException = $exception;
+                    try {
+                        static::getInstance()->tracker->handleRequest();
+                    } catch (\Throwable $e) {
+                        Craft::error($e->getMessage(), __METHOD__);
+                    }
+                });
         }
     }
 
     // Protected Methods
     // =========================================================================
-
-    /**
-     * Check if tables have been created
-     *
-     * @return bool
-     */
-    protected function tableSchemaExists(): bool
-    {
-        return (Craft::$app->db->schema->getTableSchema('{{%redirectmate_tracker}}') !== null);
-    }
 
     /**
      * Creates and returns the model used to store the plugin’s settings.
