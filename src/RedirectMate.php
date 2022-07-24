@@ -69,7 +69,7 @@ class RedirectMate extends Plugin
         // Register a custom log target, keeping the format as simple as possible.
         Craft::getLogger()->dispatcher->targets[] = new MonologTarget([
             'name' => 'redirectmate',
-            'categories' => ['redirectmate'],
+            'categories' => ['redirectmate', 'vaersaagod\redirectmate\*'],
             'level' => LogLevel::INFO,
             'logContext' => false,
             'allowLineBreaks' => false,
