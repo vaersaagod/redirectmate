@@ -83,7 +83,7 @@ class RedirectMate extends Plugin
             $request = Craft::$app->getRequest();
 
             // Handle errors
-            if ($request->method === 'GET' && !$request->getIsConsoleRequest() && $request->getIsSiteRequest() && !$request->getIsLivePreview() && !$request->getIsActionRequest()) {
+            if ($request->getIsSiteRequest() && $request->method === 'GET' && !$request->getIsActionRequest() && !$request->getIsPreview() && !$request->getIsLivePreview()) {
                 Event::on(ErrorHandler::class, ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION,
                     static function(ExceptionEvent $e) {
                         $exception = $e->exception;
