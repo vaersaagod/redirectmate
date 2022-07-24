@@ -59,7 +59,7 @@ class RedirectMateUtility extends Utility
      */
     public static function contentHtml(): string
     {
-        $settings = RedirectMate::$plugin->getSettings();
+        $settings = RedirectMate::getInstance()->getSettings();
 
         try {
             Craft::$app->getView()->registerAssetBundle(RedirectMateAsset::class);

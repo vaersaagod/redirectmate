@@ -23,7 +23,7 @@ class UrlHelper extends CraftUrlHelper
      */
     public static function parseRequestUrl(Request $request): ParsedUrlModel
     {
-        $settings = RedirectMate::$plugin->getSettings();
+        $settings = RedirectMate::getInstance()->getSettings();
 
         $urlModel = new ParsedUrlModel();
         $urlModel->url = $urlModel->parsedUrl = self::normalizeUrl(self::stripQueryString($request->getAbsoluteUrl()));

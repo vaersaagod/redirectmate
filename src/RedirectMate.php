@@ -40,10 +40,6 @@ use vaersaagod\redirectmate\utilities\RedirectMateUtility;
  */
 class RedirectMate extends Plugin
 {
-    /**
-     * @var RedirectMate
-     */
-    public static RedirectMate $plugin;
 
     /**
      * @var string
@@ -62,8 +58,7 @@ class RedirectMate extends Plugin
     {
         parent::init();
 
-        self::$plugin = $this;
-        $this->name = self::$plugin->getSettings()->pluginName;
+        $this->name = self::getInstance()->getSettings()->pluginName;
 
         // Register services
         $this->setComponents([
@@ -95,7 +90,7 @@ class RedirectMate extends Plugin
 
                         if ($exception instanceof HttpException && $exception->statusCode === 404) {
                             self::$currentException = $exception;
-                            self::$plugin->tracker->handleRequest();
+                            self::getInstance()->tracker->handleRequest();
                         }
                     });
             }

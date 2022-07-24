@@ -64,7 +64,7 @@ class TrackerHelper
      */
     public static function populateModelWithRequestData(TrackerModel $trackerModel, Request $request): TrackerModel
     {
-        $settings = RedirectMate::$plugin->getSettings();
+        $settings = RedirectMate::getInstance()->getSettings();
         
         if (in_array('ip', $settings->track, true)) {
             $trackerModel->remoteIp = $request->getUserIP();
