@@ -36,7 +36,7 @@ use vaersaagod\redirectmate\utilities\RedirectMateUtility;
  * @property  TrackerService $tracker
  * @property  RedirectService $redirect
  * @property  Settings $settings
- * @method    Settings          getSettings()
+ * @method    Settings getSettings()
  */
 class RedirectMate extends Plugin
 {
@@ -74,7 +74,7 @@ class RedirectMate extends Plugin
             'logContext' => false,
             'allowLineBreaks' => false,
             'formatter' => new LineFormatter(
-                format: "%datetime% %message%\n",
+                format: "%datetime% [%level_name%] %message%\n",
                 dateFormat: 'Y-m-d H:i:s',
             ),
         ]);
