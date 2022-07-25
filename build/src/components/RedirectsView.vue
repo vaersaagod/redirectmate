@@ -96,6 +96,20 @@ export default {
             } else {
                 return 'All sites';
             }
+        },
+        getItemUrl(item, targetUrl) {
+            if (targetUrl.startsWith('http')) {
+                return targetUrl;
+            }
+            
+            // FIXME: Get primary site instead
+            let site = this.sites[0];
+            
+            if (item.siteId !== null) {
+                site = this.sites.find( ({ id }) => id === parseInt(item.siteId, 10));
+            }
+            
+            return this.Craft.getUrl(targetUrl.substring(1), null, site.baseUrl);
         }
     },
 
@@ -180,13 +194,15 @@ export default {
                         <input type="checkbox" v-model="selectedItems" :value="item.id" class="relative top-2px">
                     </td>
                     <td>
-                        <a @click="editRedirect(item.id)" target="_blank">{{ item.sourceUrl }}</a>
+                        <span v-if="item.isRegexp">{{ item.sourceUrl }}</span>
+                        <a v-else :href="getItemUrl(item, item.sourceUrl)" class="go" target="_blank">{{ item.sourceUrl }}</a>
                     </td>
                     <td>
                         {{ item.statusCode }}
                     </td>
                     <td>
-                        <a href="" target="_blank">{{ item.destinationUrl }}</a>
+                        <span v-if="item.isRegexp">{{ item.destinationUrl }}</span>
+                        <a v-else :href="getItemUrl(item, item.destinationUrl)" class="go" target="_blank">{{ item.destinationUrl }}</a>
                     </td>
                     <td>
                         {{ getSiteName(item.siteId) }}
@@ -207,7 +223,7 @@ export default {
                     </td>
                     <td>
                         <div class="text-right">
-                            <button @click="editRedirect(item.id)" class="add icon rounded-100 w-24px h-24px text-link opacity-60 group-hover:opacity-100 bg-gray-200" title="Edit"></button>
+                            <button @click="editRedirect(item.id)" class="btn small">Edit</button>
                         </div>
                     </td>
                 </tr>

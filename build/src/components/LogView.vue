@@ -152,7 +152,7 @@ export default {
         },
         getItemSourceUrl(item) {
             const site = this.sites.find( ({ id }) => id === parseInt(item.siteId, 10));
-            return this.Craft.getUrl(item.sourceUrl, null, site.baseUrl);
+            return this.Craft.getUrl(item.sourceUrl.substring(1), null, site.baseUrl);
         }
     },
 
@@ -227,14 +227,14 @@ export default {
                 <tr>
                     <th class="checkbox-column"><input type="checkbox" v-model="selectAll" class="relative top-2px"></th>
                     <th>Source URL</th>
-                    <th>Remote IP</th>
-                    <th>User Agent</th>
-                    <th>Referrer</th>
+                    <th>&nbsp;</th>
                     <th>
                         <div class="text-center">Hits</div>
                     </th>
+                    <th>Remote IP</th>
+                    <th>User Agent</th>
+                    <th>Referrer</th>
                     <!--<th>Last Hit</th>-->
-                    <th>&nbsp;</th>
                 </tr>
                 </thead>
 
@@ -245,7 +245,17 @@ export default {
                     </td>
                     <td>
                         <span class="status-dot inline-block w-10px h-10px rounded-100 mr-10" :class="{ 'bg-green-600': logItem.handled || newlyHandledItems.includes(logItem.id), 'bg-red-600': !logItem.handled && !newlyHandledItems.includes(logItem.id), 'is-checking': checkingItems.includes(logItem.id) }" :title="logItem.handled ? 'Handled' : 'Not handled'"></span>
-                        <a :href="getItemSourceUrl(logItem)" target="_blank">{{ logItem.sourceUrl }}</a>
+                        <a :href="getItemSourceUrl(logItem)" class="go" target="_blank">{{ logItem.sourceUrl }}</a>
+                    </td>
+                    <td>
+                        <div class="text-right">
+                            <button v-if="!logItem.handled" @click="addRedirectForId(logItem.id)" class="btn small">Fix</button>
+                        </div>
+                    </td>
+                    <td :title="'Last hit: ' + logItem.lastHit + '.\nCreated: ' + logItem.dateCreated">
+                        <div class="text-center">
+                            {{ logItem.hits }}
+                        </div>
                     </td>
                     <td>
                         <span v-if="logItem.remoteIp === '127.0.0.1'" class="inline-block">{{ logItem.remoteIp }}</span>
@@ -259,21 +269,11 @@ export default {
                     <td>
                         {{ logItem.referrer }}
                     </td>
-                    <td :title="'Last hit: ' + logItem.lastHit + '.\nCreated: ' + logItem.dateCreated">
-                        <div class="text-center">
-                            {{ logItem.hits }}
-                        </div>
-                    </td>
                     <!--
                     <td :title="'Created at: ' + logItem.dateCreated">
                         {{ logItem.lastHit }}
                     </td>
                     -->
-                    <td>
-                        <div class="text-right">
-                            <button v-if="!logItem.handled" @click="addRedirectForId(logItem.id)" class="add icon rounded-100 w-24px h-24px text-link opacity-60 group-hover:opacity-100 bg-gray-200" title="Add"></button>
-                        </div>
-                    </td>
                 </tr>
                 </tbody>
             </table>
