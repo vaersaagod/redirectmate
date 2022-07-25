@@ -146,7 +146,7 @@ class RedirectHelper
      *
      * @return RedirectModel
      */
-    public static function insertOrUpdateModel(RedirectModel $redirectModel): RedirectModel
+    public static function insertOrUpdateRedirect(RedirectModel $redirectModel): RedirectModel
     {
 
         $attributes = $redirectModel->getAttributes(null, ['uid', 'dateCreated', 'dateUpdated']);

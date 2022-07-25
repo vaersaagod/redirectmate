@@ -123,7 +123,7 @@ class RedirectService extends Component
         CacheHelper::invalidateAllCaches();
 
         // Insert or update redirect and return it
-        return RedirectHelper::insertOrUpdateModel($redirectModel);
+        return RedirectHelper::insertOrUpdateRedirect($redirectModel);
 
     }
 
