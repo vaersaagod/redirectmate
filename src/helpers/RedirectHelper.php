@@ -31,7 +31,7 @@ class RedirectHelper
 
     /**
      * @param ParsedUrlModel $parsedUrlModel
-     * @param Site           $site
+     * @param Site $site
      *
      * @return null|RedirectModel
      * @throws \JsonException
@@ -39,9 +39,9 @@ class RedirectHelper
     public static function getRedirectForUrlAndSite(ParsedUrlModel $parsedUrlModel, Site $site): ?RedirectModel
     {
         $cacheAttributes = $parsedUrlModel->getAttributes();
-        
+
         $cacheKey = md5(json_encode($cacheAttributes, JSON_THROW_ON_ERROR));
-        
+
         if (RedirectMate::getInstance()?->getSettings()->cacheEnabled) {
             try {
                 $cachedRedirect = CacheHelper::getCachedRedirect($cacheKey);
@@ -50,22 +50,22 @@ class RedirectHelper
                     return $cachedRedirect;
                 }
             } catch (\Throwable $throwable) {
-                Craft::error('An error occured when trying to get cached redirect'.$throwable->getMessage(), __METHOD__);
+                Craft::error('An error occured when trying to get cached redirect' . $throwable->getMessage(), __METHOD__);
             }
         }
-        
+
         // Match exact match redirects
         $urlPatterns = [
             $parsedUrlModel->parsedUrl,
-            $parsedUrlModel->url.'?'.$parsedUrlModel->queryString,
+            $parsedUrlModel->url . '?' . $parsedUrlModel->queryString,
             $parsedUrlModel->url,
             $parsedUrlModel->parsedPath,
-            $parsedUrlModel->path.'?'.$parsedUrlModel->queryString,
+            $parsedUrlModel->path . '?' . $parsedUrlModel->queryString,
             $parsedUrlModel->path
         ];
-        
-        $query = (new RedirectQuery())
-            ->orderBy(new Expression('FIELD (sourceUrl, \''.implode('\',\'', $urlPatterns).'\')'))
+
+        $redirect = (new RedirectQuery())
+            ->orderBy(new Expression('FIELD (sourceUrl, \'' . implode('\',\'', $urlPatterns) . '\')'))
             ->where([
                 'or', [
                     'siteId' => $site->id,
@@ -74,9 +74,8 @@ class RedirectHelper
                 ]
             ])
             ->andWhere(['sourceUrl' => $urlPatterns])
-            ->andWhere(['isRegexp' => false]);
-
-        $redirect = $query->one();
+            ->andWhere(['isRegexp' => false])
+            ->one();
 
         if ($redirect) {
             CacheHelper::setCachedRedirect($cacheKey, $redirect->getAttributes());
@@ -104,7 +103,7 @@ class RedirectHelper
                 $target = $parsedUrlModel->parsedUrl;
             }
 
-            $pattern = '`'.$redirect->sourceUrl.'`i';
+            $pattern = '`' . $redirect->sourceUrl . '`i';
 
             try {
                 if (preg_match($pattern, $target) === 1) {
@@ -117,7 +116,7 @@ class RedirectHelper
                     return $redirect;
                 }
             } catch (\Throwable $throwable) {
-                Craft::error('Error in regexp "'.$pattern.'": '.$throwable->getMessage(), __METHOD__);
+                Craft::error('Error in regexp "' . $pattern . '": ' . $throwable->getMessage(), __METHOD__);
             }
         }
 
