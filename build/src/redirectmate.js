@@ -28,21 +28,35 @@ const axiosInstance = axios.create({
 });
 
 const app = createApp({
-    inject: ['$axios', 'Craft'],
+    inject: ['$axios', 'Craft', 'Garnish'],
     data() {
         return {
-            activeTab: 'log',
+            activeTab: window.LOCATION_HASH || 'tab--log',
         }
     },
     watch: {
-        activeTab(newTab, oldTab) {
-
-        }
+        // activeTab(newTab, oldTab) {
+        //     
+        // }
     },
     methods: {
-
+        initTabs() {
+            const tabs = document.getElementById('redirectmate-tabs');
+            if (!tabs) {
+                return;
+            }
+            const tabManager = new Craft.Tabs(tabs);
+            tabManager.on('selectTab', e => {
+                this.activeTab = e.$tab.data('id');
+                Garnish.requestAnimationFrame(() => {
+                    history.replaceState(undefined, undefined, e.$tab.attr('href'));
+                });
+            });
+            tabManager.selectTab(this.activeTab);
+        }
     },
     mounted() {
+        this.initTabs();
     },
     compilerOptions: {
         delimiters: ["${", "}$"]
@@ -55,4 +69,5 @@ app.component('CreateRedirectModal', CreateRedirectModal);
 
 app.provide('$axios', axiosInstance);
 app.provide('Craft', window.Craft);
+app.provide('Garnish', window.Garnish);
 app.mount('#redirectMateApp');

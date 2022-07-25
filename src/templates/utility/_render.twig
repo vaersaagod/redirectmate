@@ -1,21 +1,28 @@
 {# @var settings \vaersaagod\redirectmate\models\Settings #}
 
+{% set tabs = {
+    log: 'Log'|t('redirectmate'),
+    redirects: 'Redirects'|t('redirectmate')
+} %}
+
 <div class="redirectmate-utility" id="redirectMateApp" v-cloak>
     <header id="content-header" class="pane-header">
-        <div class="pane-tabs">
-            <div class="" role="tablist" aria-label="Primary fields">
-                <a id="tab-tab--log" :class="{ sel: activeTab == 'log' }" @click.prevent="activeTab = 'log'" href="#tab--log" tabindex="0" role="tab" data-id="tab--log" aria-controls="tab--log" aria-selected="true">
-                    <span class="tab-label">Log</span>
-                </a>
-                <a id="tab-tab--redirects" :class="{ sel: activeTab == 'redirects' }" @click.prevent="activeTab = 'redirects'" href="#tab--redirects" tabindex="-1" role="tab" data-id="tab--redirects" aria-controls="tab--redirects" aria-selected="false">
-                    <span class="tab-label">Redirects</span>
-                </a>
-            </div>
-        </div>
+        {{ include('_includes/tabs.twig', {
+            containerAttributes: {
+                id: 'redirectmate-tabs',
+            },
+            tabs: tabs|keys|reduce((carry, id) => carry|merge({
+                ("tab--#{id}"): {
+                    tabId: "tab-tab--#{id}",
+                    label: tabs[id],
+                    url: "#tab--#{id}"
+                }
+            }), {})
+        }) }}
     </header>
 
-    <log-view v-if="activeTab === 'log'"></log-view>
-    <redirects-view v-if="activeTab === 'redirects'"></redirects-view>
+    <log-view v-if="activeTab === 'tab--log'"></log-view>
+    <redirects-view v-if="activeTab === 'tab--redirects'"></redirects-view>
 </div>
 
 {% set sites = craft.app.getSites().getAllSites() %}
