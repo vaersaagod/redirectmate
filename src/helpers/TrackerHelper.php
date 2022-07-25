@@ -21,6 +21,11 @@ class TrackerHelper
      */
     public static function getOrCreateModel(string $sourceUrl, Site $site): TrackerModel
     {
+
+        $existingTrackerModel = TrackerModel::find()
+            ->where(['sourceUrl' => $sourceUrl, 'siteId' => $site->id])
+            ->one();
+
         try {
             $lastHit = Db::prepareDateForDb(new \DateTime());
         } catch (\Exception) {
@@ -34,15 +39,11 @@ class TrackerHelper
             'hits' => 0,
         ]);
 
-        $existingModel = (new TrackerQuery())
-            ->where(['sourceUrl' => $sourceUrl, 'siteId' => $site->id])
-            ->one();
-
-        if ($existingModel === null) {
+        if (!$existingTrackerModel) {
             return $trackerModel;
         }
         
-        $trackerModel->setAttributes($existingModel->getAttributes(), false);
+        $trackerModel->setAttributes($existingTrackerModel->getAttributes(), false);
         
         return $trackerModel;
     }

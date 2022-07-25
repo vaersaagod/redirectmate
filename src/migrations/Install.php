@@ -3,8 +3,6 @@
 namespace vaersaagod\redirectmate\migrations;
 
 use Craft;
-use craft\config\DbConfig;
-use craft\db\Connection;
 use craft\db\Migration;
 
 class Install extends Migration
@@ -90,9 +88,9 @@ class Install extends Migration
                     'referrer' => $this->string(1000)->defaultValue(''),
                     'remoteIp' => $this->string(45)->defaultValue(''),
                     'userAgent' => $this->string(255)->defaultValue(''),
-                    'hits' => $this->integer()->defaultValue(1),
+                    'hits' => $this->integer()->notNull()->defaultValue(1),
                     'lastHit' => $this->dateTime(),
-                    'handled' => $this->boolean()->defaultValue(false),
+                    'handled' => $this->boolean()->notNull()->defaultValue(false),
                 ]
             );
         }
@@ -119,7 +117,7 @@ class Install extends Migration
                     'destinationElementId' => $this->integer()->null()->defaultValue(null),
                     'statusCode' => $this->string(8)->defaultValue('301'),
                     'isRegexp' => $this->boolean()->defaultValue(false),
-                    'hits' => $this->integer()->defaultValue(0),
+                    'hits' => $this->integer()->notNull()->defaultValue(0),
                     'lastHit' => $this->dateTime(),
                 ]
             );

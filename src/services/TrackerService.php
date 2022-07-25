@@ -5,6 +5,7 @@ namespace vaersaagod\redirectmate\services;
 use Craft;
 use craft\base\Component;
 use craft\db\Query;
+
 use vaersaagod\redirectmate\helpers\RedirectHelper;
 use vaersaagod\redirectmate\helpers\TrackerHelper;
 use vaersaagod\redirectmate\helpers\UrlHelper;

@@ -4,12 +4,11 @@ namespace vaersaagod\redirectmate\controllers;
 
 use craft\web\Controller;
 
-use vaersaagod\redirectmate\db\RedirectQuery;
-use vaersaagod\redirectmate\db\TrackerQuery;
 use vaersaagod\redirectmate\helpers\RedirectHelper;
 use vaersaagod\redirectmate\helpers\TrackerHelper;
 use vaersaagod\redirectmate\helpers\UrlHelper;
 use vaersaagod\redirectmate\models\RedirectModel;
+use vaersaagod\redirectmate\models\TrackerModel;
 use vaersaagod\redirectmate\RedirectMate;
 
 use yii\web\Response;
@@ -39,7 +38,7 @@ class CpController extends Controller
         $site = \Craft::$app->getRequest()->getParam('site', 'all');
         $sortBy = \Craft::$app->getRequest()->getParam('sortBy', 'hits');
 
-        $query = new TrackerQuery();
+        $query = TrackerModel::find();
         
         if ($handled !== 'all') {
             $query->andWhere('handled = ' . ($handled === 'handled' ? '1' : '0'));
@@ -77,7 +76,7 @@ class CpController extends Controller
     {
         $id = \Craft::$app->getRequest()->getRequiredParam('id');
 
-        $query = (new TrackerQuery())
+        $query = TrackerModel::find()
             ->where('id=:id', ['id' => $id]);
 
         if (!$trackerModel = $query->one()) {
@@ -132,7 +131,7 @@ class CpController extends Controller
         $site = \Craft::$app->getRequest()->getParam('site', 'all');
         $sortBy = \Craft::$app->getRequest()->getParam('sortBy', 'newest');
 
-        $query = new RedirectQuery();
+        $query = RedirectModel::find();
 
         if ($site !== 'all') {
             $query->andWhere('siteId = :site', ['site' => $site]);

@@ -5,10 +5,8 @@ namespace vaersaagod\redirectmate\services;
 use Craft;
 use craft\base\Component;
 
-use vaersaagod\redirectmate\db\RedirectQuery;
 use vaersaagod\redirectmate\helpers\CacheHelper;
 use vaersaagod\redirectmate\helpers\RedirectHelper;
-use vaersaagod\redirectmate\helpers\TrackerHelper;
 use vaersaagod\redirectmate\helpers\UrlHelper;
 use vaersaagod\redirectmate\models\RedirectModel;
 use vaersaagod\redirectmate\RedirectMate;
@@ -77,7 +75,7 @@ class RedirectService extends Component
     public function addRedirect(RedirectModel $redirectModel): RedirectModel
     {
         // Check if we already have a redirect with this source URL and site ID, if so, update it.
-        $query = (new RedirectQuery())
+        $query = RedirectModel::find()
             ->where(['sourceUrl' => $redirectModel->sourceUrl]);
 
         if ($redirectModel->siteId !== null) {
@@ -98,7 +96,7 @@ class RedirectService extends Component
         }
 
         // Check if we have any redirects with source URL equal to our destination. This opens up for redirect loops, which we should avoid (?)
-        $query = (new RedirectQuery())
+        $query = RedirectModel::find()
             ->where(['sourceUrl' => $redirectModel->destinationUrl]);
 
         if (isset($redirectModel->siteId)) {

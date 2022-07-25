@@ -23,10 +23,9 @@ class RedirectHelper
      */
     public static function getOrCreateModel(string|int $id): RedirectModel
     {
-        $redirect = (new RedirectQuery())
+        return RedirectModel::find()
             ->where(['id' => $id])
-            ->one();
-        return $redirect ?? new RedirectModel();
+            ->one() ?? new RedirectModel();
     }
 
     /**
@@ -63,7 +62,7 @@ class RedirectHelper
             $parsedUrlModel->path
         ];
 
-        $redirect = (new RedirectQuery())
+        $redirect = RedirectModel::find()
             ->orderBy(new Expression('FIELD (sourceUrl, \'' . implode('\',\'', $urlPatterns) . '\')'))
             ->where([
                 'or', [
@@ -82,7 +81,7 @@ class RedirectHelper
         }
 
         // Match regexp redirects
-        $redirects = (new RedirectQuery())
+        $redirects = RedirectModel::find()
             ->orderBy('dateCreated DESC')
             ->where([
                 'or', [
