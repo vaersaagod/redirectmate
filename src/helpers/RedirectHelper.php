@@ -32,8 +32,7 @@ class RedirectHelper
     /**
      * @param ParsedUrlModel $parsedUrlModel
      * @param Site $site
-     *
-     * @return null|RedirectModel
+     * @return RedirectModel|null
      * @throws \JsonException
      */
     public static function getRedirectForUrlAndSite(ParsedUrlModel $parsedUrlModel, Site $site): ?RedirectModel
@@ -50,7 +49,7 @@ class RedirectHelper
                     return $cachedRedirect;
                 }
             } catch (\Throwable $throwable) {
-                Craft::error('An error occured when trying to get cached redirect' . $throwable->getMessage(), __METHOD__);
+                Craft::error('An error occurred when trying to get cached redirect' . $throwable->getMessage(), __METHOD__);
             }
         }
 

@@ -12,6 +12,8 @@ class CacheHelper
     public const KEY_REDIRECT_PREFIX = 'redirectmate_redirect_';
 
     /**
+     * @param string $key
+     * @return RedirectModel|null
      * @throws \JsonException
      */
     public static function getCachedRedirect(string $key): ?RedirectModel
@@ -22,6 +24,9 @@ class CacheHelper
     }
 
     /**
+     * @param string $key
+     * @param array $data
+     * @return void
      * @throws \JsonException
      */
     public static function setCachedRedirect(string $key, array $data): void
