@@ -13,7 +13,6 @@ use craft\base\Model;
 use craft\base\Plugin;
 use craft\events\ExceptionEvent;
 use craft\events\RegisterComponentTypesEvent;
-use craft\helpers\App;
 use craft\log\MonologTarget;
 use craft\services\Utilities;
 use craft\web\ErrorHandler;
@@ -104,9 +103,6 @@ class RedirectMate extends Plugin
                     try {
                         static::getInstance()->tracker->handleRequest();
                     } catch (\Throwable $e) {
-                        if (App::devMode()) {
-                            throw $e;
-                        }
                         Craft::error($e->getMessage(), __METHOD__);
                     }
                 });
