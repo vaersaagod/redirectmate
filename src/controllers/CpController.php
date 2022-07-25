@@ -3,12 +3,15 @@
 namespace vaersaagod\redirectmate\controllers;
 
 use craft\web\Controller;
+
+use vaersaagod\redirectmate\db\RedirectQuery;
+use vaersaagod\redirectmate\db\TrackerQuery;
 use vaersaagod\redirectmate\helpers\RedirectHelper;
 use vaersaagod\redirectmate\helpers\TrackerHelper;
 use vaersaagod\redirectmate\helpers\UrlHelper;
 use vaersaagod\redirectmate\models\RedirectModel;
-use vaersaagod\redirectmate\models\TrackerModel;
 use vaersaagod\redirectmate\RedirectMate;
+
 use yii\web\Response;
 
 
@@ -21,7 +24,11 @@ class CpController extends Controller
 
     // Public Methods
     // =========================================================================
-    
+
+    /**
+     * @return Response
+     * @throws \yii\web\BadRequestHttpException
+     */
     public function actionGetLogs(): Response
     {
         $this->requireAcceptsJson();
@@ -32,7 +39,7 @@ class CpController extends Controller
         $site = \Craft::$app->getRequest()->getParam('site', 'all');
         $sortBy = \Craft::$app->getRequest()->getParam('sortBy', 'hits');
 
-        $query = TrackerHelper::getQuery();
+        $query = new TrackerQuery();
         
         if ($handled !== 'all') {
             $query->andWhere('handled = ' . ($handled === 'handled' ? '1' : '0'));
@@ -62,28 +69,29 @@ class CpController extends Controller
         ]);
     }
 
+    /**
+     * @return Response
+     * @throws \yii\web\BadRequestHttpException
+     */
     public function actionCheckLogItem(): Response
     {
         $id = \Craft::$app->getRequest()->getRequiredParam('id');
 
-        $query = TrackerHelper::getQuery();
-        $query->where('id=:id', ['id' => $id]);
-        $item = $query->one();
-        
-        if (!$item) {
+        $query = (new TrackerQuery())
+            ->where('id=:id', ['id' => $id]);
+
+        if (!$trackerModel = $query->one()) {
             return $this->asFailure('Could not find log item.', ['id' => $id]);
         }
-        
-        $trackerModel = new TrackerModel($item);
-        
+
         try {
             $url = UrlHelper::siteUrl($trackerModel->sourceUrl, null, null, $trackerModel->siteId);
         } catch (\Throwable $throwable) {
             return $this->asFailure('An error occured when trying to create URL: ' . $throwable->getMessage());
         }
-        
+
         $statusCode = UrlHelper::getUrlStatusCode($url);
-        
+
         return $this->asSuccess('URL checked', ['id' => $id, 'code' => $statusCode, 'handled' => $statusCode !== 404 ]);
     }
     
@@ -124,7 +132,7 @@ class CpController extends Controller
         $site = \Craft::$app->getRequest()->getParam('site', 'all');
         $sortBy = \Craft::$app->getRequest()->getParam('sortBy', 'newest');
 
-        $query = RedirectHelper::getQuery();
+        $query = new RedirectQuery();
 
         if ($site !== 'all') {
             $query->andWhere('siteId = :site', ['site' => $site]);

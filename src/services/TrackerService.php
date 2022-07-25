@@ -24,8 +24,10 @@ class TrackerService extends Component
 {
 
     /**
-     * @param null $request
-     *
+     * @param $request
+     * @return void
+     * @throws \craft\errors\SiteNotFoundException
+     * @throws \yii\base\Exception
      * @throws \yii\base\InvalidConfigException
      */
     public function handleRequest($request = null): void
@@ -36,7 +38,6 @@ class TrackerService extends Component
             $currentSite = Craft::$app->getSites()->getCurrentSite();
         } catch (\Throwable $e) {
             Craft::error($e->getMessage(), __METHOD__);
-
             return;
         }
 
@@ -61,22 +62,20 @@ class TrackerService extends Component
         try {
             $redirect = RedirectHelper::getRedirectForUrlAndSite($parsedUrl, $currentSite);
         } catch (\Throwable $throwable) {
-            Craft::error('An error occured when trying to get redirect: '.$throwable->getMessage());
+            Craft::error('An error occurred when trying to get redirect: ' . $throwable->getMessage(), __METHOD__);
             $redirect = null;
         }
 
         if ($redirect === null) {
             $trackerModel->handled = false;
-            TrackerHelper::insertOrUpdateData($trackerModel->getAttributes());
-
+            TrackerHelper::insertOrUpdateTracker($trackerModel);
             return;
         }
 
         $trackerModel->handled = true;
-        TrackerHelper::insertOrUpdateData($trackerModel->getAttributes());
+        TrackerHelper::insertOrUpdateTracker($trackerModel);
         RedirectMate::getInstance()->redirect->doRedirect($redirect);
     }
-
 
     private function shouldExclude(ParsedUrlModel $parsedUrlModel, string $siteHandle): bool
     {

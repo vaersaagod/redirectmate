@@ -1,72 +1,71 @@
 <?php
 
-
 namespace vaersaagod\redirectmate\models;
 
-
 use craft\base\Model;
+use vaersaagod\redirectmate\db\TrackerQuery;
 
 class TrackerModel extends Model
 {
     /**
-     * @var int
+     * @var int|null
      */
-    public $id;
-    
+    public ?int $id = null;
+
     /**
-     * @var string
+     * @var string|null
      */
-    public $uid;
-    
+    public ?string $uid = null;
+
     /**
      * @var null|int
      */
-    public $siteId;
+    public ?int $siteId = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $sourceUrl;
+    public ?string $sourceUrl = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $referrer;
+    public ?string $referrer = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $remoteIp;
+    public ?string $remoteIp = null;
 
     /**
-     * @var string
+     * @var ?string
      */
-    public $userAgent;
+    public string|null $userAgent = null;
 
     /**
      * @var int
      */
-    public $hits;
-
-    /**
-     * @var \DateTime
-     */
-    public $lastHit;
+    public int $hits = 0;
 
     /**
      * @var bool
      */
-    public $handled = false;
+    public bool $handled = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
-    public $dateCreated;
+    public ?\DateTime $dateCreated = null;
     
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
-    public $dateUpdated;
+    public ?\DateTime $dateUpdated = null;
+
+    /**
+     * @var \DateTime|null
+     */
+    public ?\DateTime $lastHit = null;
 
 
     // Public Methods
@@ -78,5 +77,13 @@ class TrackerModel extends Model
     public function rules(): array
     {
         return [];
+    }
+
+    /**
+     * @return TrackerQuery
+     */
+    public static function find(): TrackerQuery
+    {
+        return new TrackerQuery();
     }
 }
