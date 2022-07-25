@@ -3,26 +3,17 @@
 namespace vaersaagod\redirectmate\helpers;
 
 use Craft;
-use craft\db\Query;
 use craft\helpers\Db;
 use craft\models\Site;
 use craft\web\Request;
+
+use vaersaagod\redirectmate\db\TrackerQuery;
 use vaersaagod\redirectmate\models\TrackerModel;
 use vaersaagod\redirectmate\RedirectMate;
-use yii\db\Exception;
 
 class TrackerHelper 
 {
 
-    /**
-     * @return Query
-     */
-    public static function getQuery(): Query
-    {
-        return (new Query())
-            ->from(['{{%redirectmate_tracker}}']);
-    }
-    
     /**
      * @param string $sourceUrl
      * @param Site $site
@@ -30,29 +21,29 @@ class TrackerHelper
      */
     public static function getOrCreateModel(string $sourceUrl, Site $site): TrackerModel
     {
+
+        $existingTrackerModel = TrackerModel::find()
+            ->where(['sourceUrl' => $sourceUrl, 'siteId' => $site->id])
+            ->one();
+
         try {
             $lastHit = Db::prepareDateForDb(new \DateTime());
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $lastHit = null;
         }
-        
+
         $trackerModel = new TrackerModel([
             'sourceUrl' => $sourceUrl, 
             'siteId' => $site->id, 
+            'lastHit' => $lastHit,
             'hits' => 0,
-            'lastHit' => $lastHit
         ]);
-        
-        $existingData = (new Query())
-            ->from(['{{%redirectmate_tracker}}'])
-            ->where(['sourceUrl' => $sourceUrl, 'siteId' => $site->id])
-            ->one();
-        
-        if ($existingData === null) {
+
+        if (!$existingTrackerModel) {
             return $trackerModel;
         }
         
-        $trackerModel->setAttributes($existingData, false);
+        $trackerModel->setAttributes($existingTrackerModel->getAttributes(), false);
         
         return $trackerModel;
     }
@@ -82,24 +73,29 @@ class TrackerHelper
     }
 
     /**
-     * @param array $data
+     * @param TrackerModel $trackerModel
+     * @return void
      */
-    public static function insertOrUpdateData(array $data): void
+    public static function insertOrUpdateTracker(TrackerModel $trackerModel): void
     {
+
         $db = Craft::$app->getDb();
 
-        unset($data['uid'], $data['dateCreated'], $data['dateUpdated']);
+        $attributes = $trackerModel->getAttributes(null, ['uid', 'dateCreated', 'dateUpdated']);
+        if (isset($trackerModel->lastHit)) {
+            $attributes['lastHit'] = Db::prepareDateForDb($trackerModel->lastHit);
+        }
 
-        if ($data['id'] !== null) {
+        if (isset($trackerModel->id)) {
             try {
-                $db->createCommand()->update('{{%redirectmate_tracker}}', $data, ['id' => $data['id']])->execute();
-            } catch (Exception $e) {
+                $db->createCommand()->update(TrackerQuery::TABLE, $attributes, ['id' => $trackerModel->id])->execute();
+            } catch (\Exception) {
                 // Do not log, it's ok.
             }
         } else {
             try {
-                $db->createCommand()->insert('{{%redirectmate_tracker}}', $data)->execute();
-            } catch (Exception $e) {
+                $db->createCommand()->insert(TrackerQuery::TABLE, $attributes)->execute();
+            } catch (\Exception $e) {
                 Craft::error($e->getMessage(), __METHOD__);
             }
         }
@@ -107,8 +103,8 @@ class TrackerHelper
 
     /**
      * @param array $ids
-     *
-     * @throws Exception
+     * @return void
+     * @throws \yii\db\Exception
      */
     public static function deleteAllByIds(array $ids): void
     {
@@ -117,15 +113,16 @@ class TrackerHelper
         }
         
         $db = Craft::$app->getDb();
-        $db->createCommand()->delete('{{%redirectmate_tracker}}', ['in', 'id', $ids])->execute();
+        $db->createCommand()->delete(TrackerQuery::TABLE, ['in', 'id', $ids])->execute();
     }
-    
+
     /**
-     * @throws Exception
+     * @return void
+     * @throws \yii\db\Exception
      */
     public static function deleteAll(): void
     {
         $db = Craft::$app->getDb();
-        $db->createCommand()->delete('{{%redirectmate_tracker}}')->execute();
+        $db->createCommand()->delete(TrackerQuery::TABLE)->execute();
     }
 }

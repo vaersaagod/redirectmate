@@ -1,16 +1,16 @@
 <?php
 
-
 namespace vaersaagod\redirectmate\models;
-
 
 use craft\base\Model;
 
+use vaersaagod\redirectmate\db\RedirectQuery;
+
 class RedirectModel extends Model
 {
+
     public const MATCHBY_PATH = 'pathonly';
     public const MATCHBY_FULLURL = 'fullurl';
-
     public const STATUSCODE_301_PERMANENT = '301';
     public const STATUSCODE_302_TEMPORARY = '302';
     public const STATUSCODE_307_TEMPORARY_REDIRECT = '307';
@@ -18,74 +18,74 @@ class RedirectModel extends Model
     public const STATUSCODE_410_GONE = '410';
     
     /**
-     * @var int
+     * @var ?int
      */
-    public $id;
+    public int|null $id = null;
 
     /**
      * @var string
      */
-    public $uid;
+    public ?string $uid = null;
 
     /**
      * @var null|int
      */
-    public $siteId;
+    public ?int $siteId = null;
 
     /**
      * @var bool
      */
-    public $enabled = true;
+    public bool $enabled = true;
 
     /**
      * @var string
      */
-    public $matchBy = self::MATCHBY_PATH;
+    public string $matchBy = self::MATCHBY_PATH;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $sourceUrl;
+    public ?string $sourceUrl = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $destinationUrl;
+    public ?string $destinationUrl = '/';
     
     /**
      * @var null|int
      */
-    public $destinationElementId;
+    public ?int $destinationElementId = null;
 
     /**
      * @var string
      */
-    public $statusCode = self::STATUSCODE_301_PERMANENT;
+    public string $statusCode = self::STATUSCODE_301_PERMANENT;
 
     /**
      * @var boolean
      */
-    public $isRegexp = false;
+    public bool $isRegexp = false;
 
     /**
      * @var int
      */
-    public $hits = 0;
+    public int $hits = 0;
 
     /**
-     * @var string
+     * @var \DateTime|null
      */
-    public $lastHit;
-
-    /**
-     * @var \DateTime
-     */
-    public $dateCreated;
+    public ?\DateTime $dateCreated = null;
     
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
-    public $dateUpdated;
+    public ?\DateTime $dateUpdated = null;
+
+    /**
+     * @var \DateTime|null
+     */
+    public ?\DateTime $lastHit = null;
     
 
     // Public Methods
@@ -98,4 +98,13 @@ class RedirectModel extends Model
     {
         return [];
     }
+
+    /**
+     * @return RedirectQuery
+     */
+    public static function find(): RedirectQuery
+    {
+        return new RedirectQuery();
+    }
+
 }

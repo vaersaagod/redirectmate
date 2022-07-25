@@ -55,6 +55,41 @@ class UrlHelper extends CraftUrlHelper
         return $urlModel;
     }
 
+    public static function parseUrl(string $url): ParsedUrlModel
+    {
+        $settings = RedirectMate::getInstance()->getSettings();
+
+        $urlModel = new ParsedUrlModel();
+        $urlModel->url = $urlModel->parsedUrl = self::normalizeUrl(self::stripQueryString($url));
+        $urlModel->path = $urlModel->parsedPath = self::normalizeUrl(parse_url($url, PHP_URL_PATH));
+        $urlModel->queryString = urldecode(parse_url($url, PHP_URL_QUERY));
+
+        $request = \Craft::$app->getRequest();
+
+        $queryStringParams = $request->getQueryParams();
+        unset($queryStringParams['p']);
+
+        if ($settings->trackQueryString === true && count($queryStringParams) > 0) {
+            ksort($queryStringParams);
+            $queryString = urldecode(http_build_query($queryStringParams));
+        }
+
+        if (is_array($settings->trackQueryString) && count($queryStringParams) > 0 && count($settings->trackQueryString) > 0) {
+            $filteredParams = array_filter($queryStringParams, static function($k) use (&$settings) {
+                return in_array($k, $settings->trackQueryString, true);
+            }, ARRAY_FILTER_USE_KEY);
+
+            ksort($filteredParams);
+            $queryString = urldecode(http_build_query($filteredParams));
+        }
+
+        if (!empty($queryString)) {
+            $urlModel->parsedPath = $urlModel->path.'?'.$queryString;
+            $urlModel->parsedUrl = $urlModel->url.'?'.$queryString;
+        }
+
+        return $urlModel;
+    }
 
     public static function getUrlStatusCode($url): int
     {

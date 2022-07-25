@@ -3,12 +3,14 @@
 namespace vaersaagod\redirectmate\helpers;
 
 use Craft;
-use craft\db\Query;
 use craft\helpers\Db;
 use craft\models\Site;
+
+use vaersaagod\redirectmate\db\RedirectQuery;
 use vaersaagod\redirectmate\models\ParsedUrlModel;
 use vaersaagod\redirectmate\models\RedirectModel;
 use vaersaagod\redirectmate\RedirectMate;
+
 use yii\db\Exception;
 use yii\db\Expression;
 
@@ -16,43 +18,28 @@ class RedirectHelper
 {
 
     /**
-     * @return Query
+     * @param string|int $id
+     * @return RedirectModel
      */
-    public static function getQuery(): Query
+    public static function getOrCreateModel(string|int $id): RedirectModel
     {
-        return (new Query())
-            ->from(['{{%redirectmate_redirects}}']);
-    }
-
-    public static function getOrCreateModel($id): RedirectModel
-    {
-        $existingData = (new Query())
-            ->from(['{{%redirectmate_redirects}}'])
+        return RedirectModel::find()
             ->where(['id' => $id])
-            ->one();
-
-        if ($existingData) {
-            $model = new RedirectModel($existingData);
-        } else {
-            $model = new RedirectModel();
-        }
-
-        return $model;
+            ->one() ?? new RedirectModel();
     }
 
     /**
      * @param ParsedUrlModel $parsedUrlModel
-     * @param Site           $site
-     *
-     * @return null|RedirectModel
+     * @param Site $site
+     * @return RedirectModel|null
      * @throws \JsonException
      */
     public static function getRedirectForUrlAndSite(ParsedUrlModel $parsedUrlModel, Site $site): ?RedirectModel
     {
         $cacheAttributes = $parsedUrlModel->getAttributes();
-        
+
         $cacheKey = md5(json_encode($cacheAttributes, JSON_THROW_ON_ERROR));
-        
+
         if (RedirectMate::getInstance()?->getSettings()->cacheEnabled) {
             try {
                 $cachedRedirect = CacheHelper::getCachedRedirect($cacheKey);
@@ -61,23 +48,22 @@ class RedirectHelper
                     return $cachedRedirect;
                 }
             } catch (\Throwable $throwable) {
-                Craft::error('An error occured when trying to get cached redirect'.$throwable->getMessage(), __METHOD__);
+                Craft::error('An error occurred when trying to get cached redirect' . $throwable->getMessage(), __METHOD__);
             }
         }
-        
+
         // Match exact match redirects
         $urlPatterns = [
             $parsedUrlModel->parsedUrl,
-            $parsedUrlModel->url.'?'.$parsedUrlModel->queryString,
+            $parsedUrlModel->url . '?' . $parsedUrlModel->queryString,
             $parsedUrlModel->url,
             $parsedUrlModel->parsedPath,
-            $parsedUrlModel->path.'?'.$parsedUrlModel->queryString,
+            $parsedUrlModel->path . '?' . $parsedUrlModel->queryString,
             $parsedUrlModel->path
         ];
-        
-        $query = (new Query())
-            ->from(['{{%redirectmate_redirects}}'])
-            ->orderBy(new Expression('FIELD (sourceUrl, \''.implode('\',\'', $urlPatterns).'\')'))
+
+        $redirect = RedirectModel::find()
+            ->orderBy(new Expression('FIELD (sourceUrl, \'' . implode('\',\'', $urlPatterns) . '\')'))
             ->where([
                 'or', [
                     'siteId' => $site->id,
@@ -86,18 +72,16 @@ class RedirectHelper
                 ]
             ])
             ->andWhere(['sourceUrl' => $urlPatterns])
-            ->andWhere(['isRegexp' => false]);
+            ->andWhere(['isRegexp' => false])
+            ->one();
 
-        $redirectData = $query->one();
-
-        if ($redirectData !== null) {
-            CacheHelper::setCachedRedirect($cacheKey, $redirectData);
-            return new RedirectModel($redirectData);
+        if ($redirect) {
+            CacheHelper::setCachedRedirect($cacheKey, $redirect->getAttributes());
+            return $redirect;
         }
 
         // Match regexp redirects
-        $query = (new Query())
-            ->from(['{{%redirectmate_redirects}}'])
+        $redirects = RedirectModel::find()
             ->orderBy('dateCreated DESC')
             ->where([
                 'or', [
@@ -106,34 +90,31 @@ class RedirectHelper
                     'siteId' => null,
                 ]
             ])
-            ->andWhere(['isRegexp' => true]);
+            ->andWhere(['isRegexp' => true])
+            ->all();
 
-        $reqexpRecords = $query->all();
+        foreach ($redirects as $redirect) {
 
-        foreach ($reqexpRecords as $reqexpRecord) {
-            $redirectModel = new RedirectModel($reqexpRecord);
-
-            if ($redirectModel->matchBy === RedirectModel::MATCHBY_PATH) {
+            if ($redirect->matchBy === RedirectModel::MATCHBY_PATH) {
                 $target = $parsedUrlModel->parsedPath;
             } else {
                 $target = $parsedUrlModel->parsedUrl;
             }
 
-            $pattern = '`'.$redirectModel->sourceUrl.'`i';
+            $pattern = '`' . $redirect->sourceUrl . '`i';
 
             try {
                 if (preg_match($pattern, $target) === 1) {
-                    $redirectModel->destinationUrl = preg_replace(
+                    $redirect->destinationUrl = preg_replace(
                         $pattern,
-                        $redirectModel->destinationUrl,
+                        $redirect->destinationUrl,
                         $target,
                     );
-
-                    CacheHelper::setCachedRedirect($cacheKey, $redirectModel->getAttributes());
-                    return $redirectModel;
+                    CacheHelper::setCachedRedirect($cacheKey, $redirect->getAttributes());
+                    return $redirect;
                 }
             } catch (\Throwable $throwable) {
-                Craft::error('Error in regexp "'.$pattern.'": '.$throwable->getMessage(), __METHOD__);
+                Craft::error('Error in regexp "' . $pattern . '": ' . $throwable->getMessage(), __METHOD__);
             }
         }
 
@@ -154,42 +135,44 @@ class RedirectHelper
         }
 
         try {
-            $db->createCommand()->update('{{%redirectmate_redirects}}', ['hits' => new Expression('hits + 1'), 'lastHit' => $lastHit], ['id' => $redirect->id])->execute();
+            $db->createCommand()->update(RedirectQuery::TABLE, ['hits' => new Expression('hits + 1'), 'lastHit' => $lastHit], ['id' => $redirect->id])->execute();
         } catch (Exception $e) {
             // Do not log, it's ok.
         }
     }
 
     /**
-     * @param RedirectModel $model
+     * @param RedirectModel $redirectModel
      *
      * @return RedirectModel
      */
-    public static function insertOrUpdateData(RedirectModel $model): RedirectModel
+    public static function insertOrUpdateRedirect(RedirectModel $redirectModel): RedirectModel
     {
-        $data = $model->getAttributes();
+
+        $attributes = $redirectModel->getAttributes(null, ['uid', 'dateCreated', 'dateUpdated']);
+        if (isset($redirectModel->lastHit)) {
+            $attributes['lastHit'] = Db::prepareDateForDb($redirectModel->lastHit);
+        }
 
         $db = Craft::$app->getDb();
 
-        unset($data['uid'], $data['dateCreated'], $data['dateUpdated']);
-
-        if ($data['id'] !== null) {
+        if (isset($redirectModel->id)) {
             try {
-                $db->createCommand()->update('{{%redirectmate_redirects}}', $data, ['id' => $data['id']])->execute();
+                $db->createCommand()->update(RedirectQuery::TABLE, $attributes, ['id' => $redirectModel->id])->execute();
             } catch (Exception $e) {
                 // Do not log, it's ok.
-                $model->addError('*', $e->getMessage());
+                $redirectModel->addError('*', $e->getMessage());
             }
         } else {
             try {
-                $db->createCommand()->insert('{{%redirectmate_redirects}}', $data)->execute();
+                $db->createCommand()->insert(RedirectQuery::TABLE, $attributes)->execute();
             } catch (Exception $e) {
                 Craft::error($e->getMessage(), __METHOD__);
-                $model->addError('*', $e->getMessage());
+                $redirectModel->addError('*', $e->getMessage());
             }
         }
 
-        return $model;
+        return $redirectModel;
     }
 
     /**
@@ -204,7 +187,7 @@ class RedirectHelper
         }
 
         $db = Craft::$app->getDb();
-        $db->createCommand()->delete('{{%redirectmate_redirects}}', ['in', 'id', $ids])->execute();
+        $db->createCommand()->delete(RedirectQuery::TABLE, ['in', 'id', $ids])->execute();
     }
 
 }
