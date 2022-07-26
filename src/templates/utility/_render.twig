@@ -32,9 +32,6 @@
     window.redirectMate = {
         csrfToken: "{{ craft.app.request.csrfToken }}",
         sites: {{ sitesArr|json_encode|raw }},
-        i18n: {
-        
-        },
         actions: {
             getRedirects: "{{ actionUrl('redirectmate/cp/get-redirects') }}",
             addRedirect: "{{ actionUrl('redirectmate/cp/add-redirect') }}",

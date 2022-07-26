@@ -92,9 +92,9 @@ export default {
         getSiteName(siteId) {
             if (siteId) {
                 const site = this.sites.find( ({ id }) => id === siteId );
-                return site ? site.name : 'Unknown';
+                return site ? site.name : Craft.t('redirectmate', 'Unknown');
             } else {
-                return 'All sites';
+                return Craft.t('redirectmate', 'All sites');
             }
         },
         getItemUrl(item, targetUrl) {
@@ -133,16 +133,16 @@ export default {
 
                 <div class="select">
                     <select v-model="serverParams.site" @change="updateTable">
-                        <option value="all">All sites</option>
+                        <option value="all">{{ Craft.t('redirectmate', 'All sites') }}</option>
                         <option v-for="item in sites" :value="item.id">{{ item.name }}</option>
                     </select>
                 </div>
 
                 <div class="select">
                     <select v-model="serverParams.sortBy" @change="updateTable">
-                        <option value="newest">Newest first</option>
-                        <option value="hits">By hits</option>
-                        <option value="lasthit">Last hit</option>
+                        <option value="newest">{{ Craft.t('redirectmate', 'Newest first') }}</option>
+                        <option value="hits">{{ Craft.t('redirectmate', 'By hits') }}</option>
+                        <option value="lasthit">{{ Craft.t('redirectmate', 'Last hit') }}</option>
                     </select>
                 </div>
 
@@ -150,14 +150,14 @@ export default {
 
                 <div data-align="left" class="menu">
                     <ul role="listbox">
-                        <li @click="batchDeleteItems"><a>Delete</a></li>
+                        <li @click="batchDeleteItems"><a>{{ Craft.t('redirectmate', 'Delete') }}</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="flex">
-                <button class="btn disabled" disabled>Export</button>
-                <button @click="addRedirect" class="btn submit add icon">New redirect</button>
+                <button class="btn disabled" disabled>{{ Craft.t('redirectmate', 'Export') }}</button>
+                <button @click="addRedirect" class="btn submit add icon">{{ Craft.t('redirectmate', 'New redirect') }}</button>
             </div>
         </div>
 
@@ -166,7 +166,7 @@ export default {
         </div>
 
         <div class="w-100" v-if="items && items.length == 0">
-            <p class="mx-auto py-70 text-center">No redirects.</p>
+            <p class="mx-auto py-70 text-center">{{ Craft.t('redirectmate', 'No redirects.') }}</p>
         </div>
 
         <div class="w-100" v-if="items && items.length > 0">
@@ -174,16 +174,16 @@ export default {
                 <thead>
                 <tr>
                     <th class="checkbox-column"><input type="checkbox" v-model="selectAll" class="relative top-2px"></th>
-                    <th>Source URL</th>
-                    <th>Status</th>
-                    <th>Destination URL</th>
-                    <th>Site</th>
-                    <th>Match by</th>
-                    <th>Regexp?</th>
+                    <th>{{ Craft.t('redirectmate', 'Source URL') }}</th>
+                    <th>{{ Craft.t('redirectmate', 'Status') }}</th>
+                    <th>{{ Craft.t('redirectmate', 'Destination URL') }}</th>
+                    <th>{{ Craft.t('redirectmate', 'Site') }}</th>
+                    <th>{{ Craft.t('redirectmate', 'Match by') }}</th>
+                    <th>{{ Craft.t('redirectmate', 'Regexp?') }}</th>
                     <th>
-                        <div class="text-right">Hits</div>
+                        <div class="text-right">{{ Craft.t('redirectmate', 'Hits') }}</div>
                     </th>
-                    <th>Last Hit</th>
+                    <th>{{ Craft.t('redirectmate', 'Last hit') }}</th>
                     <th>&nbsp;</th>
                 </tr>
                 </thead>
@@ -211,19 +211,21 @@ export default {
                         {{ item.matchBy }}
                     </td>
                     <td>
-                        {{ item.isRegexp == true ? 'Yes' : 'No' }}
+                        {{ item.isRegexp == true ? Craft.t('app', 'Yes') : Craft.t('app', 'No') }}
                     </td>
                     <td>
                         <div class="text-right">
                             {{ item.hits }}
                         </div>
                     </td>
-                    <td :title="'Created at: '+item.dateCreated">
+                    <td :title="`${Craft.t('redirectmate', 'Created at: {date}', {
+                        date: item.dateCreated
+                    })}`">
                         {{ item.lastHit }}
                     </td>
                     <td>
                         <div class="text-right">
-                            <button @click="editRedirect(item.id)" class="btn small">Edit</button>
+                            <button @click="editRedirect(item.id)" class="btn small">{{ Craft.t('redirectmate', 'Edit') }}</button>
                         </div>
                     </td>
                 </tr>
@@ -231,9 +233,13 @@ export default {
             </table>
 
             <div class="mt-40 flex justify-between">
-                <p class="text-gray-500">Displaying {{ ((serverParams.page - 1) * serverParams.perPage) + 1 }} to {{ Math.min(serverParams.page * serverParams.perPage, totalCount) }} of {{ totalCount }} items</p>
+              <p class="text-gray-500">{{ Craft.t('redirectmate', 'Displaying {from} to {to} of {total} items', {
+                from: ((serverParams.page - 1) * serverParams.perPage) + 1,
+                to: Math.min(serverParams.page * serverParams.perPage, totalCount),
+                total: totalCount
+              }) }}</p>
                 <div class="flex">
-                    <span class="text-gray-500">Display:</span>
+                    <span class="text-gray-500">{{ Craft.t('redirectmate', 'Display') }}:</span>
                     <div class="select">
                         <select name="limit" v-model="serverParams.perPage" @change="updateTable">
                             <option value="10">10</option>
