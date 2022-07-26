@@ -194,7 +194,7 @@ export default {
 
 <template>
     <div @click="closeCallback()" class="fixed full flex justify-center modal-shade z-99 flex" v-if="isVisible">
-        <form @click.stop="" class="relative flex flex-col bg-white justify-between w-[calc(100%-16px)] max-w-[750px] rounded-5px overflow-hidden modal-box-shadow">
+        <form @click.stop="" class="relative flex flex-col bg-white justify-between w-[calc(100%-16px)] max-w-[550px] rounded-5px overflow-hidden modal-box-shadow">
             <div class="w-100 p-40">
                 <h1>{{ Craft.t('redirectmate', 'Create redirect') }}</h1>
                 <div>
@@ -219,19 +219,32 @@ export default {
                                 <input ref="sourceUrlInput" class="nicetext text fullwidth" type="text" v-model="currentData.sourceUrl">
                             </div>
                         </div>
-                        <div class="field">
-                            <div class="heading">
+                    </div>
+
+                    <div class="field flex w-100 flex-nowrap -mt-15">
+                        <div class="field flex">
+                            <div class="heading pt-6 mr-5">
+                                <label>{{ Craft.t('redirectmate', 'Match as') }}</label>
+                            </div>
+                            <div class="select">
+                                <select v-model="currentData.matchAs">
+                                    <option value="exact">{{ Craft.t('redirectmate', 'Exact Match') }}</option>
+                                    <option value="regexp">{{ Craft.t('redirectmate', 'Regexp') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="field flex ml-10" v-if="currentData.matchAs === 'regexp'">
+                            <div class="heading pt-6 mr-5">
                                 <label>{{ Craft.t('redirectmate', 'Match by') }}</label>
                             </div>
                             <div class="select">
-                                <select v-model="currentData.matchBy" class="w-[150px]">
+                                <select v-model="currentData.matchBy">
                                     <option value="pathonly">{{ Craft.t('redirectmate', 'Path only') }}</option>
                                     <option value="fullurl">{{ Craft.t('redirectmate', 'Full URL') }}</option>
                                 </select>
                             </div>
                         </div>
                     </div>
-
                     <div class="field flex w-100 flex-nowrap">
                         <div class="field w-100">
                             <div class="heading">
@@ -241,18 +254,6 @@ export default {
                             <div class="input relative">
                                 <input ref="destionationUrlInput" class="nicetext text fullwidth" type="text" v-model="currentData.destinationUrl">
                                 <button type="button" @click.prevent="openElementSelect" class="icon search absolute right-0 top-0 w-40px h-34px bg-black bg-opacity-5 hover:bg-opacity-7 transition-colors duration-200 border-1 border-black border-opacity-5" aria-label="Search for element"></button>
-                            </div>
-                        </div>
-
-                        <div class="field">
-                            <div class="heading">
-                                <label>{{ Craft.t('redirectmate', 'Match as') }}</label>
-                            </div>
-                            <div class="select">
-                                <select v-model="currentData.matchAs" class="w-[150px]">
-                                    <option value="exact">{{ Craft.t('redirectmate', 'Exact Match') }}</option>
-                                    <option value="regexp">{{ Craft.t('redirectmate', 'Regexp') }}</option>
-                                </select>
                             </div>
                         </div>
                     </div>

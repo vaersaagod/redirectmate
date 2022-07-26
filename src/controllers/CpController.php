@@ -196,6 +196,14 @@ class CpController extends Controller
         $redirectModel->destinationUrl = UrlHelper::isUrl($destinationUrl) ? $destinationUrl : UrlHelper::normalizeUrl($destinationUrl);
         $redirectModel->isRegexp = $data['matchAs'] === 'regexp';
         $redirectModel->statusCode = $data['statusCode'];
+
+        if (!$redirectModel->isRegexp) {
+            if (str_starts_with($redirectModel->sourceUrl, 'http')) {
+                $redirectModel->matchBy = RedirectModel::MATCHBY_FULLURL;
+            } else {
+                $redirectModel->matchBy = RedirectModel::MATCHBY_PATH;
+            }
+        }
         
         if (!$redirectModel->validate()) {
             return $this->asFailure(Craft::t('redirectmate', 'Redirect validation failed.'), $redirectModel->getErrors());
