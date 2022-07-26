@@ -208,7 +208,7 @@ export default {
                         {{ getSiteName(item.siteId) }}
                     </td>
                     <td>
-                        {{ item.matchBy }}
+                        {{ item.matchBy == 'fullurl' ? Craft.t('redirectmate', 'Full URL') : Craft.t('redirectmate', 'Path only') }}
                     </td>
                     <td>
                         {{ item.isRegexp == true ? Craft.t('app', 'Yes') : Craft.t('app', 'No') }}
