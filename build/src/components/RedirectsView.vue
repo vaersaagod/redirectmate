@@ -140,7 +140,7 @@ export default {
 
                 <div class="select">
                     <select v-model="serverParams.sortBy" @change="updateTable">
-                        <option value="newest">{{ Craft.t('redirectmate', 'Newest first') }}</option>
+                        <option value="newest">{{ Craft.t('redirectmate', 'Newest') }}</option>
                         <option value="hits">{{ Craft.t('redirectmate', 'By hits') }}</option>
                         <option value="lasthit">{{ Craft.t('redirectmate', 'Last hit') }}</option>
                     </select>

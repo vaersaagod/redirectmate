@@ -207,7 +207,7 @@ export default {
             </div>
 
             <div class="flex">
-                <button class="btn disabled" disabled>{{ Craft.t('redirectmate', 'w') }}</button>
+                <button class="btn disabled" disabled>{{ Craft.t('redirectmate', 'Export') }}</button>
                 <button @click="clearLog" class="btn delete icon">{{ Craft.t('redirectmate', 'Clear log') }}</button>
                 <button @click="resolve" class="btn submit add icon">{{ Craft.t('redirectmate', 'Resolve') }}</button>
             </div>
@@ -229,7 +229,7 @@ export default {
                     <th>{{ Craft.t('redirectmate', 'Source URL') }}</th>
                     <th>&nbsp;</th>
                     <th>
-                        <div class="text-center">Hits</div>
+                        <div class="text-center">{{ Craft.t('redirectmate', 'Hits') }}</div>
                     </th>
                     <th>{{ Craft.t('redirectmate', 'Remote IP') }}</th>
                     <th>{{ Craft.t('redirectmate', 'User Agent') }}</th>

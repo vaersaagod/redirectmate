@@ -33,7 +33,7 @@ return [
     'Match as' => 'Match as',
     'Match by' => 'Match by',
     'New redirect' => 'New redirect',
-    'Newest first' => 'Newest first',
+    'Newest' => 'Newest',
     'No errors have been logged.' => 'No errors have been logged.',
     'No log items to delete.' => 'No log items to delete.',
     'No more unhandled errors!' => 'No more unhandled errors!',
