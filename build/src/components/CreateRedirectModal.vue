@@ -86,7 +86,7 @@ export default {
             return this.logItems.find(item => item.id === id);
         },
         getNextItem() {
-            return this.logItems.find(item => !this.processedIds.includes(item.id) && item.handled === 0);
+            return this.logItems.find(item => !this.processedIds.includes(item.id) && item.handled === false);
         },
         updateCurrent() {
             this.resetCurrentData();
