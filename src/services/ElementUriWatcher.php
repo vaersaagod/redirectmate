@@ -20,7 +20,7 @@ use yii\base\Event;
 use yii\base\ModelEvent;
 
 /**
- * AutoRedirects Service
+ * ElementUriWatcher Service
  * This is an internal service, dealing with automatically creating redirects when elements' URIs change
  *
  * @author    Værsågod
