@@ -36,6 +36,15 @@ class TrackerQuery extends Query
     }
 
     /**
+     * @param $db
+     * @return TrackerModel[]|array
+     */
+    public function all($db = null): array
+    {
+        return parent::all($db);
+    }
+
+    /**
      * @inheritdoc
      * @return TrackerModel[]|array The resulting tracker models
      */

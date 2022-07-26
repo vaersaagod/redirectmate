@@ -19,10 +19,12 @@ use craft\web\ErrorHandler;
 
 use Monolog\Formatter\LineFormatter;
 use Psr\Log\LogLevel;
+
 use yii\base\Event;
 use yii\web\HttpException;
 
 use vaersaagod\redirectmate\models\Settings;
+use vaersaagod\redirectmate\services\ElementUriWatcher;
 use vaersaagod\redirectmate\services\RedirectService;
 use vaersaagod\redirectmate\services\TrackerService;
 use vaersaagod\redirectmate\utilities\RedirectMateUtility;
@@ -35,6 +37,7 @@ use vaersaagod\redirectmate\utilities\RedirectMateUtility;
  *
  * @property  TrackerService $tracker
  * @property  RedirectService $redirect
+ * @property  ElementUriWatcher $elementUriWatcher The internal service for auto-creating element redirects
  * @property  Settings $settings
  * @method    Settings getSettings()
  */
@@ -58,12 +61,13 @@ class RedirectMate extends Plugin
     {
         parent::init();
 
-        $this->name = self::getInstance()->getSettings()->pluginName;
+        $this->name = static::getInstance()->getSettings()->pluginName;
 
         // Register services
         $this->setComponents([
             'tracker' => TrackerService::class,
             'redirect' => RedirectService::class,
+            'elementUriWatcher' => ElementUriWatcher::class,
         ]);
 
         // Register a custom log target, keeping the format as simple as possible.
@@ -93,7 +97,7 @@ class RedirectMate extends Plugin
                 static function (ExceptionEvent $e) {
                     $exception = $e->exception;
                     if ($exception instanceof \Twig\Error\RuntimeError && ($previousException = $exception->getPrevious()) !== null) {
-                        // Use the previous exception in the case of a Twig Runtime exception
+                        // Use the previous exception in the case of a Twig runtime exception
                         $exception = $previousException;
                     }
                     if (!$exception instanceof HttpException || $exception->statusCode !== 404) {
@@ -107,6 +111,12 @@ class RedirectMate extends Plugin
                     }
                 });
         }
+
+        // Automatically create element redirects
+        if (static::getInstance()->getSettings()->autoCreateElementRedirects) {
+            static::getInstance()->elementUriWatcher->watchElementUris();
+        }
+
     }
 
     // Protected Methods
@@ -124,6 +134,5 @@ class RedirectMate extends Plugin
 
     // Private Methods
     // =========================================================================
-
 
 }
