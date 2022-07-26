@@ -2,6 +2,7 @@
 
 namespace vaersaagod\redirectmate\controllers;
 
+use Craft;
 use craft\web\Controller;
 
 use vaersaagod\redirectmate\helpers\RedirectHelper;
@@ -32,11 +33,11 @@ class CpController extends Controller
     {
         $this->requireAcceptsJson();
         
-        $limit = \Craft::$app->getRequest()->getParam('perPage', 20);
-        $page = \Craft::$app->getRequest()->getParam('page', 1);
-        $handled = \Craft::$app->getRequest()->getParam('handled', 'all');
-        $site = \Craft::$app->getRequest()->getParam('site', 'all');
-        $sortBy = \Craft::$app->getRequest()->getParam('sortBy', 'hits');
+        $limit = Craft::$app->getRequest()->getParam('perPage', 20);
+        $page = Craft::$app->getRequest()->getParam('page', 1);
+        $handled = Craft::$app->getRequest()->getParam('handled', 'all');
+        $site = Craft::$app->getRequest()->getParam('site', 'all');
+        $sortBy = Craft::$app->getRequest()->getParam('sortBy', 'hits');
 
         $query = TrackerModel::find();
         
@@ -74,62 +75,75 @@ class CpController extends Controller
      */
     public function actionCheckLogItem(): Response
     {
-        $id = \Craft::$app->getRequest()->getRequiredParam('id');
+        $id = Craft::$app->getRequest()->getRequiredParam('id');
 
         $query = TrackerModel::find()
             ->where('id=:id', ['id' => $id]);
 
         if (!$trackerModel = $query->one()) {
-            return $this->asFailure('Could not find log item.', ['id' => $id]);
+            return $this->asFailure(Craft::t('redirectmate', 'Could not find log item.'), ['id' => $id]);
         }
 
         try {
             $url = UrlHelper::siteUrl($trackerModel->sourceUrl, null, null, $trackerModel->siteId);
         } catch (\Throwable $throwable) {
-            return $this->asFailure('An error occured when trying to create URL: ' . $throwable->getMessage());
+            Craft::error($throwable->getMessage(), __METHOD__);
+            return $this->asFailure(Craft::t('redirectmate', 'An error occurred when trying to create URL.'));
         }
 
         $statusCode = UrlHelper::getUrlStatusCode($url);
 
-        return $this->asSuccess('URL checked', ['id' => $id, 'code' => $statusCode, 'handled' => $statusCode !== 404 ]);
+        return $this->asSuccess(Craft::t('redirectmate', 'URL checked'), ['id' => $id, 'code' => $statusCode, 'handled' => $statusCode !== 404 ]);
     }
-    
+
+    /**
+     * @return Response
+     */
     public function actionDeleteLogItems(): Response
     {
-        $ids = \Craft::$app->getRequest()->getParam('ids');
+        $ids = Craft::$app->getRequest()->getParam('ids');
         
         if (empty($ids)) {
-            return $this->asFailure(\Craft::t('redirectmate', 'No ids to delete.'));
+            return $this->asFailure(Craft::t('redirectmate', 'No log items to delete.'));
         }
         
         try {
             TrackerHelper::deleteAllByIds($ids);
         } catch (\Throwable $throwable) {
-            return $this->asFailure(\Craft::t('redirectmate', 'An error occured: ') . ' ' . $throwable->getMessage());
+            Craft::error($throwable->getMessage(), __METHOD__);
+            return $this->asFailure(Craft::t('redirectmate', 'An error occurred.'));
         }
         
         return $this->asSuccess('Big success');
     }
-    
+
+    /**
+     * @return Response
+     */
     public function actionDeleteAllLogItems(): Response
     {
         try {
             TrackerHelper::deleteAll();
         } catch (\Throwable $throwable) {
-            return $this->asFailure(\Craft::t('redirectmate', 'An error occured: ') . ' ' . $throwable->getMessage());
+            Craft::error($throwable->getMessage(), __METHOD__);
+            return $this->asFailure(Craft::t('redirectmate', 'An error occurred.'));
         }
         
         return $this->asSuccess('Big success');
     }
-    
+
+    /**
+     * @return Response
+     * @throws \yii\web\BadRequestHttpException
+     */
     public function actionGetRedirects(): Response
     {
         $this->requireAcceptsJson();
         
-        $limit = \Craft::$app->getRequest()->getParam('perPage', 20);
-        $page = \Craft::$app->getRequest()->getParam('page', 1);
-        $site = \Craft::$app->getRequest()->getParam('site', 'all');
-        $sortBy = \Craft::$app->getRequest()->getParam('sortBy', 'newest');
+        $limit = Craft::$app->getRequest()->getParam('perPage', 20);
+        $page = Craft::$app->getRequest()->getParam('page', 1);
+        $site = Craft::$app->getRequest()->getParam('site', 'all');
+        $sortBy = Craft::$app->getRequest()->getParam('sortBy', 'newest');
 
         $query = RedirectModel::find();
 
@@ -159,10 +173,13 @@ class CpController extends Controller
             'data' => $query->all()
         ]);
     }
-    
+
+    /**
+     * @return Response
+     */
     public function actionAddRedirect(): Response
     {
-        $data = \Craft::$app->getRequest()->getParam('redirectData');
+        $data = Craft::$app->getRequest()->getParam('redirectData');
         
         if (isset($data['id'])) {
             $redirectModel = RedirectHelper::getOrCreateModel($data['id']);
@@ -181,13 +198,13 @@ class CpController extends Controller
         $redirectModel->statusCode = $data['statusCode'];
         
         if (!$redirectModel->validate()) {
-            return $this->asFailure(\Craft::t('redirectmate', 'Validation failed'), $redirectModel->getErrors());
+            return $this->asFailure(Craft::t('redirectmate', 'Redirect validation failed.'), $redirectModel->getErrors());
         } 
         
         $result = RedirectMate::getInstance()->redirect->addRedirect($redirectModel);
         
         if ($result->hasErrors()) {
-            return $this->asFailure(\Craft::t('redirectmate', 'An error occured when saving.'), $result->getErrors());
+            return $this->asFailure(Craft::t('redirectmate', 'An error occurred when saving.'), $result->getErrors());
         }
 
         // If we've a tracker, check it
@@ -211,21 +228,25 @@ class CpController extends Controller
             }
         }
         
-        return $this->asSuccess(\Craft::t('redirectmate', 'Redirect saved.'), $result->getAttributes());
+        return $this->asSuccess(Craft::t('redirectmate', 'Redirect saved.'), $result->getAttributes());
     }
-    
+
+    /**
+     * @return Response
+     */
     public function actionDeleteRedirects(): Response
     {
-        $ids = \Craft::$app->getRequest()->getParam('ids');
+        $ids = Craft::$app->getRequest()->getParam('ids');
         
         if (empty($ids)) {
-            return $this->asFailure(\Craft::t('redirectmate', 'No ids to delete.'));
+            return $this->asFailure(Craft::t('redirectmate', 'No redirects to delete.'));
         }
         
         try {
             RedirectHelper::deleteAllByIds($ids);
         } catch (\Throwable $throwable) {
-            return $this->asFailure(\Craft::t('redirectmate', 'An error occured:') . ' ' . $throwable->getMessage());
+            Craft::error($throwable->getMessage(), __METHOD__);
+            return $this->asFailure(Craft::t('redirectmate', 'An error occurred.'));
         }
         
         return $this->asSuccess('Big success');
