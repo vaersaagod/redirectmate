@@ -8,6 +8,7 @@ use craft\helpers\FileHelper;
 use craft\helpers\UrlHelper;
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
+use craft\web\View;
 
 use GuzzleHttp\Client;
 
@@ -64,6 +65,35 @@ class RedirectMateAsset extends AssetBundle
                 return UrlHelper::isFullUrl($filePath);
             });
         }
+    }
+
+    /**
+     * @param $view
+     * @return void
+     */
+    public function registerAssetFiles($view): void
+    {
+        parent::registerAssetFiles($view);
+
+        if ($view instanceof View) {
+            $this->_registerTranslations($view);
+        }
+    }
+
+    /**
+     * Registers all of RedirectMate's static translations, for use in JS
+     *
+     * @param View $view
+     * @return void
+     */
+    private function _registerTranslations(View $view): void
+    {
+        $translations = @include(App::parseEnv('@vaersaagod/redirectmate/translations/en/redirectmate.php'));
+        if (!is_array($translations)) {
+            Craft::error('Unable to register translations', __METHOD__);
+            return;
+        }
+        $view->registerTranslations('redirectmate', array_keys($translations));
     }
 
     /**

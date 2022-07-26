@@ -71,7 +71,7 @@ export default {
             this.activeModal = true;
         },
         clearLog() {
-            if (window.confirm('Are you sure you want to clear the log?')) {
+            if (window.confirm(Craft.t('redirectmate', 'Are you sure you want to clear the log?'))) {
                 this.$axios.post(window.redirectMate.actions.deleteAllLogItems, {})
                     .then(({ data }) => {
                         this.loadItems();
@@ -89,19 +89,19 @@ export default {
             console.log('batchCheckItems', this.selectedItems);
             this.checkingItems = this.selectedItems;
             this.selectedItems = [];
-            
+
             this.checkNextItem();
         },
         checkNextItem() {
             const nextId = this.checkingItems[0];
-            
+
             this.$axios.post(window.redirectMate.actions.checkLogItem, { id: nextId })
                 .then(({ data }) => {
                     console.log(data);
-                    
+
                     this.updateHandledStatus(nextId, data.handled);
                     this.checkingItems.shift()
-                    
+
                     if (this.checkingItems.length > 0) {
                         this.checkNextItem();
                     } else {
@@ -176,23 +176,23 @@ export default {
 
                 <div class="select">
                     <select v-model="serverParams.site" @change="updateTable">
-                        <option value="all">All sites</option>
+                        <option value="all">{{ Craft.t('redirectmate', 'All sites' )}}</option>
                         <option v-for="item in sites" :value="item.id">{{ item.name }}</option>
                     </select>
                 </div>
 
                 <div class="select">
                     <select v-model="serverParams.handled" @change="updateTable">
-                        <option value="all">All errors</option>
-                        <option value="handled">Handled</option>
-                        <option value="nothandled">Not Handled</option>
+                        <option value="all">{{ Craft.t('redirectmate', 'All errors') }}</option>
+                        <option value="handled">{{ Craft.t('redirectmate', 'Handled') }}</option>
+                        <option value="nothandled">{{ Craft.t('redirectmate', 'Not Handled') }}</option>
                     </select>
                 </div>
-                
+
                 <div class="select">
                     <select v-model="serverParams.sortBy" @change="updateTable">
-                        <option value="hits">By hits</option>
-                        <option value="lasthit">Last hit</option>
+                        <option value="hits">{{ Craft.t('redirectmate', 'By hits') }}</option>
+                        <option value="lasthit">{{ Craft.t('redirectmate', 'Last hit') }}</option>
                     </select>
                 </div>
 
@@ -200,16 +200,16 @@ export default {
 
                 <div data-align="left" class="menu">
                     <ul role="listbox">
-                        <li @click="batchDeleteItems"><a>Delete</a></li>
-                        <li><a @click="batchCheckItems">Check</a></li>
+                        <li @click="batchDeleteItems"><a>{{ Craft.t('redirectmate', 'Delete') }}</a></li>
+                        <li><a @click="batchCheckItems">{{ Craft.t('redirectmate', 'Check') }}</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="flex">
-                <button class="btn disabled" disabled>Export</button>
-                <button @click="clearLog" class="btn delete icon">Clear log</button>
-                <button @click="resolve" class="btn submit add icon">Resolve</button>
+                <button class="btn disabled" disabled>{{ Craft.t('redirectmate', 'w') }}</button>
+                <button @click="clearLog" class="btn delete icon">{{ Craft.t('redirectmate', 'Clear log') }}</button>
+                <button @click="resolve" class="btn submit add icon">{{ Craft.t('redirectmate', 'Resolve') }}</button>
             </div>
         </div>
 
@@ -218,7 +218,7 @@ export default {
         </div>
 
         <div class="w-100" v-if="items && items.length == 0">
-            <p class="mx-auto py-70 text-center">No errors have been logged.</p>
+            <p class="mx-auto py-70 text-center">{{ Craft.t('redirectmate', 'No errors have been logged.') }}</p>
         </div>
 
         <div class="w-100" v-if="items && items.length > 0">
@@ -226,14 +226,14 @@ export default {
                 <thead>
                 <tr>
                     <th class="checkbox-column"><input type="checkbox" v-model="selectAll" class="relative top-2px"></th>
-                    <th>Source URL</th>
+                    <th>{{ Craft.t('redirectmate', 'Source URL') }}</th>
                     <th>&nbsp;</th>
                     <th>
                         <div class="text-center">Hits</div>
                     </th>
-                    <th>Remote IP</th>
-                    <th>User Agent</th>
-                    <th>Referrer</th>
+                    <th>{{ Craft.t('redirectmate', 'Remote IP') }}</th>
+                    <th>{{ Craft.t('redirectmate', 'User Agent') }}</th>
+                    <th>{{ Craft.t('redirectmate', 'Referrer') }}</th>
                     <!--<th>Last Hit</th>-->
                 </tr>
                 </thead>
@@ -244,15 +244,15 @@ export default {
                         <input type="checkbox" v-model="selectedItems" :value="logItem.id" class="relative top-2px">
                     </td>
                     <td>
-                        <span class="status-dot inline-block w-10px h-10px rounded-100 mr-10" :class="{ 'bg-green-600': logItem.handled || newlyHandledItems.includes(logItem.id), 'bg-red-600': !logItem.handled && !newlyHandledItems.includes(logItem.id), 'is-checking': checkingItems.includes(logItem.id) }" :title="logItem.handled ? 'Handled' : 'Not handled'"></span>
+                        <span class="status-dot inline-block w-10px h-10px rounded-100 mr-10" :class="{ 'bg-green-600': logItem.handled || newlyHandledItems.includes(logItem.id), 'bg-red-600': !logItem.handled && !newlyHandledItems.includes(logItem.id), 'is-checking': checkingItems.includes(logItem.id) }" :title="logItem.handled ? Craft.t('redirectmate', 'Handled') : Craft.t('redirectmate', 'Not handled')"></span>
                         <a :href="getItemSourceUrl(logItem)" class="go" target="_blank">{{ logItem.sourceUrl }}</a>
                     </td>
                     <td>
                         <div class="text-right">
-                            <button v-if="!logItem.handled" @click="addRedirectForId(logItem.id)" class="btn small">Fix</button>
+                            <button v-if="!logItem.handled" @click="addRedirectForId(logItem.id)" class="btn small">{{ Craft.t('redirectmate', 'Fix') }}</button>
                         </div>
                     </td>
-                    <td :title="'Last hit: ' + logItem.lastHit + '.\nCreated: ' + logItem.dateCreated">
+                  <td :title="`${Craft.t('redirectmate', 'Last hit')}: ${logItem.lastHit}.\n${Craft.t('redirectmate', 'Created')}: ${logItem.dateCreated}`">
                         <div class="text-center">
                             {{ logItem.hits }}
                         </div>
@@ -279,9 +279,13 @@ export default {
             </table>
 
             <div class="mt-40 flex justify-between">
-                <p class="text-gray-500">Displaying {{ ((serverParams.page - 1) * serverParams.perPage) + 1 }} to {{ Math.min(serverParams.page * serverParams.perPage, totalCount) }} of {{ totalCount }} items</p>
+              <p class="text-gray-500">{{ Craft.t('redirectmate', 'Displaying {from} to {to} of {total} items', {
+                  from: ((serverParams.page - 1) * serverParams.perPage) + 1,
+                  to: Math.min(serverParams.page * serverParams.perPage, totalCount),
+                  total: totalCount
+              }) }}</p>
                 <div class="flex">
-                    <span class="text-gray-500">Display:</span>
+                    <span class="text-gray-500">{{ Craft.t('redirectmate', 'Display') }}:</span>
                     <div class="select">
                         <select name="limit" v-model="serverParams.perPage" @change="updateTable">
                             <option value="10">10</option>

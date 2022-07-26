@@ -196,15 +196,15 @@ export default {
     <div @click="closeCallback()" class="fixed full flex justify-center modal-shade z-99 flex" v-if="isVisible">
         <form @click.stop="" class="relative flex flex-col bg-white justify-between w-[calc(100%-16px)] max-w-[750px] rounded-5px overflow-hidden modal-box-shadow">
             <div class="w-100 p-40">
-                <h1>Create redirect</h1>
+                <h1>{{ Craft.t('redirectmate', 'Create redirect') }}</h1>
                 <div>
                     <div class="field">
                         <div class="heading">
-                            <label>Site</label>
+                            <label>{{ Craft.t('redirectmate', 'Site') }}</label>
                         </div>
                         <div class="select">
                             <select v-model="currentData.site" class="min-w-[200px]">
-                                <option value="all">All sites</option>
+                                <option value="all">{{ Craft.t('redirectmate', 'All sites') }}</option>
                                 <option v-for="item in sites" :value="item.id">{{ item.name }}</option>
                             </select>
                         </div>
@@ -213,7 +213,7 @@ export default {
                     <div class="field flex w-100 flex-nowrap">
                         <div class="field w-100">
                             <div class="heading">
-                                <label>Source URL</label>
+                                <label>{{ Craft.t('redirectmate', 'Source URL') }}</label>
                             </div>
                             <div class="input">
                                 <input ref="sourceUrlInput" class="nicetext text fullwidth" type="text" v-model="currentData.sourceUrl">
@@ -221,12 +221,12 @@ export default {
                         </div>
                         <div class="field">
                             <div class="heading">
-                                <label>Match by</label>
+                                <label>{{ Craft.t('redirectmate', 'Match by') }}</label>
                             </div>
                             <div class="select">
                                 <select v-model="currentData.matchBy" class="w-[150px]">
-                                    <option value="pathonly">Path only</option>
-                                    <option value="fullurl">Full URL</option>
+                                    <option value="pathonly">{{ Craft.t('redirectmate', 'Path only') }}</option>
+                                    <option value="fullurl">{{ Craft.t('redirectmate', 'Full URL') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -235,7 +235,7 @@ export default {
                     <div class="field flex w-100 flex-nowrap">
                         <div class="field w-100">
                             <div class="heading">
-                                <label>Destination URL</label>
+                                <label>{{ Craft.t('redirectmate', 'Destination URL') }}</label>
                             </div>
 
                             <div class="input relative">
@@ -246,12 +246,12 @@ export default {
 
                         <div class="field">
                             <div class="heading">
-                                <label>Match as</label>
+                                <label>{{ Craft.t('redirectmate', 'Match as') }}</label>
                             </div>
                             <div class="select">
                                 <select v-model="currentData.matchAs" class="w-[150px]">
-                                    <option value="exact">Exact Match</option>
-                                    <option value="regexp">Regexp</option>
+                                    <option value="exact">{{ Craft.t('redirectmate', 'Exact Match') }}</option>
+                                    <option value="regexp">{{ Craft.t('redirectmate', 'Regexp') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -259,7 +259,7 @@ export default {
 
                     <div class="field">
                         <div class="heading">
-                            <label>Redirect Type</label>
+                            <label>{{ Craft.t('redirectmate', 'Redirect Type') }}</label>
                         </div>
                         <div class="select">
                             <select v-model="currentData.statusCode" class="min-w-[200px]">
@@ -281,20 +281,20 @@ export default {
                 </div>
 
                 <div class="flex justify-end">
-                    <button type="button" @click.prevent="cancel" class="btn">Cancel</button>
+                    <button type="button" @click.prevent="cancel" class="btn">{{ Craft.t('redirectmate', 'Cancel') }}</button>
 
-                    <button type="submit" v-if="this.mode != 'batch'" @click.prevent="save" class="btn submit">Save</button>
-                    <button type="submit" v-if="this.mode != 'batch'" @click.prevent="saveAndAdd" class="btn submit">Save and add another</button>
+                    <button type="submit" v-if="this.mode != 'batch'" @click.prevent="save" class="btn submit">{{ Craft.t('redirectmate', 'Save') }}</button>
+                    <button type="submit" v-if="this.mode != 'batch'" @click.prevent="saveAndAdd" class="btn submit">{{ Craft.t('redirectmate', 'Save and add another') }}</button>
 
-                    <button type="button" v-if="this.mode === 'batch'" @click.prevent="skip" class="btn">Skip</button>
-                    <button type="submit" v-if="this.mode === 'batch'" @click.prevent="saveAndContinue" class="btn submit">Create and continue</button>
+                    <button type="button" v-if="this.mode === 'batch'" @click.prevent="skip" class="btn">{{ Craft.t('redirectmate', 'Skip') }}</button>
+                    <button type="submit" v-if="this.mode === 'batch'" @click.prevent="saveAndContinue" class="btn submit">{{ Craft.t('redirectmate', 'Create and continue') }}</button>
                 </div>
             </div>
 
             <div class="absolute full bg-white bg-opacity-95 z-2 p-40 flex justify-center" v-if="isAtEnd">
                 <div class="text-center w-100">
-                    <p>No more unhandled errors!</p>
-                    <button @click.prevent="cancel" class="btn submit">Close</button>
+                    <p>{{ Craft.t('redirectmate', 'No more unhandled errors!') }}</p>
+                    <button @click.prevent="cancel" class="btn submit">{{ Craft.t('redirectmate', 'Close') }}</button>
                 </div>
             </div>
         </form>
