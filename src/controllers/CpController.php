@@ -189,6 +189,27 @@ class CpController extends Controller
         if ($result->hasErrors()) {
             return $this->asFailure(\Craft::t('redirectmate', 'An error occured when saving.'), $result->getErrors());
         }
+
+        // If we've a tracker, check it
+        $trackerId = $data['logId'] ?? null;
+        if ($trackerId) {
+            $tracker = TrackerModel::find()
+                ->where('id=:id', ['id' => $trackerId])
+                ->one();
+            if ($tracker) {
+                try {
+                    if ($url = UrlHelper::siteUrl($tracker->sourceUrl, null, null, $tracker->siteId)) {
+                        $handled = UrlHelper::getUrlStatusCode($url) !== 404;
+                        if ($handled !== $tracker->handled) {
+                            $tracker->handled = $handled;
+                            TrackerHelper::insertOrUpdateTracker($tracker);
+                        }
+                    }
+                } catch (\Throwable) {
+                    // It's ok
+                }
+            }
+        }
         
         return $this->asSuccess(\Craft::t('redirectmate', 'Redirect saved.'), $result->getAttributes());
     }
