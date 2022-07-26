@@ -158,18 +158,22 @@ class RedirectHelper
 
         if (isset($redirectModel->id)) {
             try {
-                $db->createCommand()->update(RedirectQuery::TABLE, $attributes, ['id' => $redirectModel->id])->execute();
+                $result = $db->createCommand()->update(RedirectQuery::TABLE, $attributes, ['id' => $redirectModel->id])->execute();
             } catch (Exception $e) {
                 // Do not log, it's ok.
                 $redirectModel->addError('*', $e->getMessage());
             }
         } else {
             try {
-                $db->createCommand()->insert(RedirectQuery::TABLE, $attributes)->execute();
+                $result = $db->createCommand()->insert(RedirectQuery::TABLE, $attributes)->execute();
             } catch (Exception $e) {
                 Craft::error($e->getMessage(), __METHOD__);
                 $redirectModel->addError('*', $e->getMessage());
             }
+        }
+
+        if (isset($result) && !!$result) {
+            CacheHelper::invalidateAllCaches();
         }
 
         return $redirectModel;

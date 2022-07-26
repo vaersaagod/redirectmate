@@ -36,6 +36,15 @@ class RedirectQuery extends Query
     }
 
     /**
+     * @param $db
+     * @return RedirectModel[]|array
+     */
+    public function all($db = null): array
+    {
+        return parent::all($db);
+    }
+
+    /**
      * @inheritdoc
      * @return TrackerModel[]|array The resulting redirect models
      */

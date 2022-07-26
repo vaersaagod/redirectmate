@@ -16,6 +16,20 @@ class Settings extends Model
     // =========================================================================
 
     /**
+     * Whether to auto-create redirects when elements' URIs change.
+     *
+     * @var bool
+     */
+    public bool $autoCreateElementRedirects = true;
+
+    /**
+     * Which match type to use for auto-created element redirects (either "pathonly" or "fullurl")
+     *
+     * @var string
+     */
+    public string $autoCreateElementRedirectsMatchBy = RedirectModel::MATCHBY_PATH;
+
+    /**
      * @var string
      */
     public string $pluginName = 'RedirectMate';
