@@ -83,6 +83,13 @@ class Settings extends Model
      */
     public array $excludeUrlPatterns = [];
 
+    /**
+     * The delimiter to use in exported CSV files
+     *
+     * @var string
+     */
+    public string $csvDelimiter = ';';
+
 
     // Public Methods
     // =========================================================================

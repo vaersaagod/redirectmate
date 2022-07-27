@@ -259,5 +259,16 @@ class CpController extends Controller
         
         return $this->asSuccess('Big success');
     }
+
+
+    public function actionExportLogs()
+    {
+
+    }
+
+    public function actionExportRedirects()
+    {
+
+    }
     
 }
