@@ -88,7 +88,7 @@ class Settings extends Model
      *
      * @var string
      */
-    public string $csvDelimiter = ';';
+    public string $csvDelimiter = ',';
 
 
     // Public Methods

@@ -11,5 +11,5 @@ return [
     'excludeUrlPatterns' => [],
     'autoCreateElementRedirects' => true,
     'autoCreateElementRedirectsMatchBy' => 'pathonly',
-    'csvDelimiter' => ';',
+    'csvDelimiter' => ',',
 ];
