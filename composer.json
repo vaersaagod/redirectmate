@@ -25,7 +25,7 @@
     "require": {
         "php": "^8.0.2",
         "craftcms/cms": "^4.0.0",
-        "league/csv": "^8.2 || ^9.0"
+        "league/csv": "^9.8"
     },
     "require-dev": {
         "guzzlehttp/guzzle": "^7.2.0"

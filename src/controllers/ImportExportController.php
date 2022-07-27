@@ -3,18 +3,24 @@
 namespace vaersaagod\redirectmate\controllers;
 
 use Craft;
+use craft\db\Query;
 use craft\web\Controller;
 
 use League\Csv\Writer;
 
 use SplTempFileObject;
 
+use vaersaagod\redirectmate\db\RedirectQuery;
 use vaersaagod\redirectmate\db\TrackerQuery;
 use vaersaagod\redirectmate\RedirectMate;
 
 class ImportExportController extends Controller
 {
 
+    /**
+     * @return void
+     * @throws \League\Csv\CannotInsertRecord
+     */
     public function actionExportLogs()
     {
 
@@ -29,38 +35,62 @@ class ImportExportController extends Controller
             'userAgent' => Craft::t('redirectmate', 'User Agent'),
         ];
 
-        $data = (new TrackerQuery())
-            ->select(array_keys($columns))
-            ->orderBy('hits DESC')
-            ->all();
-
-        $this->exportCsvFile('logs', $data, $columns);
+        $this->_exportCsvFile('logs', TrackerQuery::TABLE, $columns);
     }
 
     public function actionExportRedirects()
     {
 
+        $columns = [
+            'sourceUrl' => Craft::t('redirectmate', 'Source URL'),
+            'destinationUrl' => Craft::t('redirectmate', 'Destination URL'),
+            'hits' => Craft::t('redirectmate', 'Hits'),
+            'matchBy' => Craft::t('redirectmate', 'Match by'),
+            'isRegexp' => Craft::t('redirectmate', 'Regexp?'),
+            'statusCode' => Craft::t('redirectmate', 'Status'),
+            'siteId' => Craft::t('redirectmate', 'Site'),
+            'lastHit' => Craft::t('redirectmate', 'Last hit'),
+            'enabled' => Craft::t('redirectmate', 'Enabled'),
+            'dateCreated' => Craft::t('redirectmate', 'Date created'),
+            'dateUpdated' => Craft::t('redirectmate', 'Date updated'),
+        ];
+
+        $this->_exportCsvFile('redirects', RedirectQuery::TABLE, $columns);
     }
 
     /**
      * @param string $filename
-     * @param array $rows
+     * @param string $table
      * @param array $columns
+     * @return void
+     * @throws \League\Csv\CannotInsertRecord
      */
-    protected function exportCsvFile(string $filename, array $rows, array $columns): void
+    private function _exportCsvFile(string $filename, string $table, array $columns): void
     {
 
-        // Help PHP detect line endings in Mac OS X
+        // Help PHP detect line endings for Mac OS X
         if (!ini_get('auto_detect_line_endings')) {
             ini_set('auto_detect_line_endings', '1');
         }
 
-        $csv = Writer::createFromFileObject(new SplTempFileObject());
-        $csv->setDelimiter(RedirectMate::getInstance()->getSettings()->csvDelimiter);
-        $csv->insertOne(array_values($columns));
-        $csv->insertAll($rows);
-
         $filename = pathinfo($filename, PATHINFO_FILENAME) . '.csv';
+
+        $data = (new Query())
+            ->from([$table])
+            ->select(array_keys($columns))
+            ->orderBy('hits DESC')
+            ->all();
+
+        $csv = Writer::createFromFileObject(new SplTempFileObject());
+
+        try {
+            $csv->setDelimiter(RedirectMate::getInstance()->getSettings()->csvDelimiter);
+        } catch (\Throwable $e) {
+            Craft::error($e, __METHOD__);
+        }
+
+        $csv->insertOne(array_values($columns));
+        $csv->insertAll($data);
 
         $csv->output($filename);
 

@@ -20,7 +20,9 @@ export default {
                 handled: 'all',
                 site: 'all',
                 sortBy: 'newest'
-            }
+            },
+
+            actions: {}
         }
     },
 
@@ -47,10 +49,10 @@ export default {
 
     methods: {
         loadItems() {
-            this.$axios.post(window.redirectMate.actions.getRedirects, this.serverParams)
+            this.$axios.post(this.actions.getRedirects, this.serverParams)
                 .then(({ data }) => {
                     console.log(data);
-                    this.totalCount = data.count;
+                    this.totalCount = parseInt(data.count, 10);
                     this.items = data.data;
                 })
                 .catch(error => {
@@ -73,7 +75,7 @@ export default {
         batchDeleteItems() {
             console.log('batchDeleteItems', this.selectedItems);
             
-            this.$axios.post(window.redirectMate.actions.deleteRedirects, { ids: this.selectedItems })
+            this.$axios.post(this.actions.deleteRedirects, { ids: this.selectedItems })
                 .then(({ data }) => {
                     console.log(data);
                     this.selectedItems = [];
@@ -115,10 +117,14 @@ export default {
 
     mounted() {
         console.log('mounted');
+
+        const { sites, actions } = window.redirectMate;
         
-        if (window.redirectMate.sites && window.redirectMate.sites.length > 0) {
-            this.sites = window.redirectMate.sites;
+        if (sites && sites.length) {
+            this.sites = sites;
         }
+
+        this.actions = actions;
         
         this.loadItems();
         Craft.initUiElements();
@@ -156,7 +162,7 @@ export default {
             </div>
 
             <div class="flex">
-                <button class="btn disabled" disabled>{{ Craft.t('redirectmate', 'Export') }}</button>
+                <a :href="totalCount ? actions.exportRedirects : false" class="btn" :class="{ disabled: !totalCount }">{{ Craft.t('redirectmate', 'Export') }}</a>
                 <button @click="addRedirect" class="btn submit add icon">{{ Craft.t('redirectmate', 'New redirect') }}</button>
             </div>
         </div>

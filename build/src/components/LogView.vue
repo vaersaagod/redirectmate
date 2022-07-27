@@ -25,6 +25,10 @@ export default {
                 handled: 'all',
                 site: 'all',
                 sortBy: 'hits'
+            },
+
+            actions: {
+
             }
         }
     },
@@ -52,11 +56,11 @@ export default {
 
     methods: {
         loadItems() {
-            this.$axios.post(window.redirectMate.actions.getLogs, this.serverParams)
+            this.$axios.post(this.actions.getLogs, this.serverParams)
                 .then(({ data }) => {
-                    console.log(data);
-                    this.totalCount = data.count;
+                    this.totalCount = parseInt(data.count, 10);
                     this.items = data.data;
+                    console.log(data, this.totalCount);
                 })
                 .catch(error => {
                     console.error(error);
@@ -72,7 +76,7 @@ export default {
         },
         clearLog() {
             if (window.confirm(Craft.t('redirectmate', 'Are you sure you want to clear the log?'))) {
-                this.$axios.post(window.redirectMate.actions.deleteAllLogItems, {})
+                this.$axios.post(this.actions.deleteAllLogItems, {})
                     .then(({ data }) => {
                         this.loadItems();
                     })
@@ -95,7 +99,7 @@ export default {
         checkNextItem() {
             const nextId = this.checkingItems[0];
 
-            this.$axios.post(window.redirectMate.actions.checkLogItem, { id: nextId })
+            this.$axios.post(this.actions.checkLogItem, { id: nextId })
                 .then(({ data }) => {
                     console.log(data);
 
@@ -124,7 +128,7 @@ export default {
         batchDeleteItems() {
             console.log('batchDeleteItems', this.selectedItems);
 
-            this.$axios.post(window.redirectMate.actions.deleteLogItems, { ids: this.selectedItems })
+            this.$axios.post(this.actions.deleteLogItems, { ids: this.selectedItems })
                 .then(({ data }) => {
                     console.log(data);
                     this.selectedItems = [];
@@ -159,9 +163,13 @@ export default {
     mounted() {
         console.log('mounted');
 
-        if (window.redirectMate.sites && window.redirectMate.sites.length > 0) {
-            this.sites = window.redirectMate.sites;
+        const { sites, actions } = window.redirectMate;
+
+        if (sites && sites.length) {
+            this.sites = sites;
         }
+
+        this.actions = actions;
 
         this.loadItems();
         Craft.initUiElements();
@@ -207,9 +215,9 @@ export default {
             </div>
 
             <div class="flex">
-                <button class="btn disabled" disabled>{{ Craft.t('redirectmate', 'Export') }}</button>
-                <button @click="clearLog" class="btn delete icon">{{ Craft.t('redirectmate', 'Clear log') }}</button>
-                <button @click="resolve" class="btn submit add icon">{{ Craft.t('redirectmate', 'Resolve') }}</button>
+                <a :href="totalCount ? actions.exportLogs : false" class="btn" :class="{ disabled: !totalCount }">{{ Craft.t('redirectmate', 'Export') }}</a>
+                <button @click="clearLog" class="btn delete icon" :class="{ disabled: !totalCount }" :disabled="!totalCount">{{ Craft.t('redirectmate', 'Clear log') }}</button>
+                <button @click="resolve" class="btn submit add icon" :class="{ disabled: !totalCount }">{{ Craft.t('redirectmate', 'Resolve') }}</button>
             </div>
         </div>
 
