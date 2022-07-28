@@ -12,13 +12,13 @@ export default {
     },
     data() {
         return {
+
             isLoading: false,
             isAtEnd: false,
             currentEditId: null,
-            message: {
-                isError: false,
-                text: '',
-            },
+
+            errorMessage: null,
+            errors: null,
 
             currentData: {
                 logId: '',
@@ -43,6 +43,15 @@ export default {
             processedIds: []
         }
     },
+    computed: {
+        hasErrors() {
+            return this.errors || this.errorMessage;
+        },
+        validationErrors() {
+            // Return a flattened list of validation errors, without the keys
+            return Object.values(this.errors || {}).reduce((carry, errors) => carry.concat(errors), []);
+        }
+    },
     watch: {
         isVisible(newStatus, oldStatus) {
             if (newStatus === true) {
@@ -53,14 +62,15 @@ export default {
 
                 this.$nextTick(() => {
                     this.updateCurrent();
-
-                    if (this.currentData.sourceUrl === '') {
-                        this.$refs.sourceUrlInput.focus();
-                    } else {
-                        this.$refs.destionationUrlInput.focus();
-                    }
+                    this.focusToFirstEmptyInput();
                 });
             }
+        },
+        errors(newValue, oldValue) {
+            if (!newValue) {
+                return;
+            }
+            this.$nextTick(this.focusToFirstErrorInput);
         }
     },
     methods: {
@@ -81,12 +91,27 @@ export default {
             this.currentData.destinationUrl = this.dataDefaults.destinationUrl;
             this.currentData.matchAs = this.dataDefaults.matchAs;
             this.currentData.statusCode = this.dataDefaults.statusCode;
+            this.errorMessage = null;
+            this.errors = null;
         },
         getItemWithId(id) {
             return this.logItems.find(item => item.id === id);
         },
         getNextItem() {
             return this.logItems.find(item => !this.processedIds.includes(item.id) && item.handled === false);
+        },
+        focusToFirstEmptyInput() {
+            if (this.currentData.sourceUrl === '') {
+                this.$refs.sourceUrlInput.focus();
+            } else {
+                this.$refs.destionationUrlInput.focus();
+            }
+        },
+        focusToFirstErrorInput() {
+            const errorInput = this.$el.querySelector('.errors input');
+            if (errorInput) {
+                errorInput.focus();
+            }
         },
         updateCurrent() {
             this.resetCurrentData();
@@ -144,9 +169,7 @@ export default {
         },
 
         doSave(saveMode) {
-            console.log(window.redirectMate.actions.addRedirect);
-            this.message.isError = false;
-            this.message.text = '';
+
             this.isLoading = true;
 
             const data = this.currentData;
@@ -159,14 +182,23 @@ export default {
                 .then(({ data }) => {
                     console.log(data);
 
+                    this.errorMessage = null;
+                    this.errors = null;
+
+                    console.log({ saveMode });
+
                     if (saveMode === 'save') {
                         this.closeCallback();
                     } else if (saveMode === 'saveAndAdd') {
                         this.currentEditId = null;
                         this.updateCurrent();
-                    } else {
+                        this.$nextTick(this.focusToFirstEmptyInput);
+                    } else if (saveMode === 'saveAndContinue') {
                         this.processCurrent();
                         this.nextItem();
+                    } else {
+                        console.error(`Unknown save mode "${saveMode}"`);
+                        throw new Error();
                     }
 
                     this.isLoading = false;
@@ -174,8 +206,15 @@ export default {
                 .catch(error => {
                     console.error(error);
                     this.isLoading = false;
-                    this.message.isError = true;
-                    this.message.text = error.response.data.message || error.message;
+                    const { errors, message: errorMessage } = error.response.data || {};
+                    if (errors) {
+                        this.errors = errors;
+                        this.errorMessage = null;
+                    } else {
+                        this.errors = null;
+                        this.errorMessage = errorMessage || error.message || Craft.t('redirectmate', 'An error occurred.');
+                    }
+                    console.log('error!', this.errors, this.errorMessage);
                 });
         }
     },
@@ -195,7 +234,7 @@ export default {
 <template>
     <div @click="closeCallback()" class="fixed full flex justify-center modal-shade z-99 flex" v-if="isVisible">
         <form @click.stop="" class="relative flex flex-col bg-white justify-between w-[calc(100%-16px)] max-w-[550px] rounded-5px overflow-hidden modal-box-shadow">
-            <div class="w-100 p-40">
+            <div class="w-100 p-30">
                 <h1>{{ Craft.t('redirectmate', 'Create redirect') }}</h1>
                 <div>
                     <div class="field">
@@ -215,7 +254,7 @@ export default {
                             <div class="heading">
                                 <label>{{ Craft.t('redirectmate', 'Source URL') }}</label>
                             </div>
-                            <div class="input">
+                            <div class="input" :class="{ errors: errors && errors.sourceUrl }">
                                 <input ref="sourceUrlInput" class="nicetext text fullwidth" type="text" v-model="currentData.sourceUrl">
                             </div>
                         </div>
@@ -251,7 +290,7 @@ export default {
                                 <label>{{ Craft.t('redirectmate', 'Destination URL') }}</label>
                             </div>
 
-                            <div class="input relative">
+                            <div class="input relative" :class="{ errors: errors && errors.destinationUrl }">
                                 <input ref="destionationUrlInput" class="nicetext text fullwidth" type="text" v-model="currentData.destinationUrl">
                                 <button type="button" @click.prevent="openElementSelect" class="icon search absolute right-0 top-0 w-40px h-34px bg-black bg-opacity-5 hover:bg-opacity-7 transition-colors duration-200 border-1 border-black border-opacity-5" aria-label="Search for element"></button>
                             </div>
@@ -274,10 +313,19 @@ export default {
                     </div>
 
                 </div>
+
+              <div class="w-full pt-20 errors" v-if="hasErrors">
+                <p class="text-red-500" v-if="errorMessage">{{ this.errorMessage }}</p>
+                <ul class="errors" v-if="validationErrors">
+                  <li class="text-red-500" v-for="error in validationErrors">{{ error }}</li>
+                </ul>
+              </div>
+
             </div>
+
             <div class="modal-footer w-100 flex-grow-0 flex justify-between">
-                <div class="flex justify-center">
-                    <div :class="{ 'text-red-500': message.isError }">{{ message.text }}</div>
+
+                <div class="flex justify-center items-center">
                     <div ref="spinner" class="spinner block w-24px h-24px" :style="{ opacity: isLoading ? 1 : 0 }"></div>
                 </div>
 

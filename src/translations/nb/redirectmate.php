@@ -54,7 +54,7 @@ return [
     'Remote IP' => 'Ekstern IP',
     'Resolve' => 'Løs',
     'Save' => 'Lagre',
-    'Save and add another' => 'Lagre og legg til ny',
+    'Save and add another' => 'Lagre og lag en ny',
     'Site' => 'Nettside',
     'Skip' => 'Hopp over',
     'Source URL' => 'Fra URL',

@@ -2,9 +2,14 @@
 
 namespace vaersaagod\redirectmate\models;
 
+use Craft;
 use craft\base\Model;
+use craft\validators\DateTimeValidator;
+use craft\validators\SiteIdValidator;
 
 use vaersaagod\redirectmate\db\RedirectQuery;
+
+use yii\validators\BooleanValidator;
 
 class RedirectModel extends Model
 {
@@ -23,7 +28,7 @@ class RedirectModel extends Model
     public int|null $id = null;
 
     /**
-     * @var string
+     * @var string|null
      */
     public ?string $uid = null;
 
@@ -43,14 +48,14 @@ class RedirectModel extends Model
     public string $matchBy = self::MATCHBY_PATH;
 
     /**
-     * @var string|null
+     * @var string
      */
-    public ?string $sourceUrl = null;
+    public string $sourceUrl = '';
 
     /**
-     * @var string|null
+     * @var string
      */
-    public ?string $destinationUrl = '/';
+    public string $destinationUrl = '';
     
     /**
      * @var null|int
@@ -92,11 +97,39 @@ class RedirectModel extends Model
     // =========================================================================
 
     /**
+     * @return array
+     */
+    public function attributeLabels(): array
+    {
+        return [
+            'id' => Craft::t('app', 'ID'),
+            'slug' => Craft::t('app', 'Slug'),
+            'uid' => Craft::t('app', 'UID'),
+            'siteId' => Craft::t('app', 'Site ID'),
+            'dateCreated' => Craft::t('app', 'Date Created'),
+            'dateUpdated' => Craft::t('app', 'Date Updated'),
+            'enabled' => Craft::t('app', 'Enabled'),
+            'sourceUrl' => Craft::t('redirectmate', 'Source URL'),
+            'destinationUrl' => Craft::t('redirectmate', 'Destination URL'),
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules(): array
     {
-        return [];
+        $rules = parent::defineRules();
+        $rules[] = [['id', 'destinationElementId', 'hits'], 'number', 'integerOnly' => true];
+        $rules[] = [
+            ['siteId'],
+            SiteIdValidator::class,
+            'allowDisabled' => true,
+        ];
+        $rules[] = [['isRegexp'], BooleanValidator::class];
+        $rules[] = [['dateCreated', 'dateUpdated', 'lastHit'], DateTimeValidator::class];
+        $rules[] = [['sourceUrl', 'statusCode', 'matchBy'], 'required'];
+        return $rules;
     }
 
     /**
