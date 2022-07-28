@@ -26,7 +26,7 @@ return [
     'Edit' => 'Rediger',
     'Enabled' => 'Aktivert',
     'Exact Match' => 'Eksakt match',
-    'Export' => 'Eksporter',
+    'Export' => 'Eksportér',
     'Fix' => 'Fiks',
     'Full URL' => 'Full URL',
     'Handled' => 'Håndtert',

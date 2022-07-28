@@ -167,7 +167,6 @@ export default {
             </div>
 
             <div class="flex">
-                <a :href="totalCount ? actions.exportRedirects : false" class="btn" :class="{ disabled: !totalCount }">{{ Craft.t('redirectmate', 'Export') }}</a>
                 <button @click="addRedirect" class="btn submit add icon">{{ Craft.t('redirectmate', 'New redirect') }}</button>
             </div>
         </div>
@@ -252,21 +251,24 @@ export default {
             </table>
 
             <div class="mt-40 flex justify-between">
-              <p class="text-gray-500">{{ Craft.t('redirectmate', 'Displaying {from} to {to} of {total} items', {
-                from: ((serverParams.page - 1) * serverParams.perPage) + 1,
-                to: Math.min(serverParams.page * serverParams.perPage, totalCount),
-                total: totalCount
-              }) }}</p>
+                <p class="text-gray-500 mb-0">{{ Craft.t('redirectmate', 'Displaying {from} to {to} of {total} items', {
+                  from: ((serverParams.page - 1) * serverParams.perPage) + 1,
+                  to: Math.min(serverParams.page * serverParams.perPage, totalCount),
+                  total: totalCount
+                }) }}</p>
                 <div class="flex">
-                    <span class="text-gray-500">{{ Craft.t('redirectmate', 'Display') }}:</span>
-                    <div class="select">
-                        <select name="limit" v-model="serverParams.perPage" @change="updateTable">
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
+                    <div class="flex">
+                        <span class="text-gray-500">{{ Craft.t('redirectmate', 'Display') }}:</span>
+                        <div class="select">
+                            <select name="limit" v-model="serverParams.perPage" @change="updateTable">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
                     </div>
+                    <a :href="totalCount ? actions.exportRedirects : false" class="btn" :class="{ disabled: !totalCount }">{{ Craft.t('redirectmate', 'Export') }}</a>
                 </div>
             </div>
         </div>
