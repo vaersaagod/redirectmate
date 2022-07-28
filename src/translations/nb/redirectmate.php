@@ -1,6 +1,8 @@
 <?php
 
 return [
+    '{from}-{to} of {total} errors' => '{from}-{to} av {total} feil',
+    '{from}-{to} of {total} redirects' => '{from}-{to} av {total} pekere',
     'All errors' => 'Alle feil',
     'All sites' => 'Alle nettsider',
     'An error occurred.' => 'En feil oppstod.',
@@ -22,7 +24,6 @@ return [
     'Delete' => 'Slett',
     'Destination URL' => 'Til URL',
     'Display' => 'Vis',
-    'Displaying {from} to {to} of {total} items' => 'Viser {from} til {to} av {total} oppføringer',
     'Edit' => 'Rediger',
     'Enabled' => 'Aktivert',
     'Exact Match' => 'Eksakt match',

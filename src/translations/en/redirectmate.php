@@ -1,6 +1,8 @@
 <?php
 
 return [
+    '{from}-{to} of {total} errors' => '{from}-{to} of {total} errors',
+    '{from}-{to} of {total} redirects' => '{from}-{to} of {total} redirects',
     'All errors' => 'All errors',
     'All sites' => 'All sites',
     'An error occurred.' => 'An error occurred.',
@@ -22,7 +24,6 @@ return [
     'Delete' => 'Delete',
     'Destination URL' => 'Destination URL',
     'Display' => 'Display',
-    'Displaying {from} to {to} of {total} items' => 'Displaying {from} to {to} of {total} items',
     'Edit' => 'Edit',
     'Enabled' => 'Enabled',
     'Exact Match' => 'Exact Match',

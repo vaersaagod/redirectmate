@@ -251,7 +251,7 @@ export default {
             </table>
 
             <div class="mt-40 flex justify-between">
-                <p class="text-gray-500 mb-0">{{ Craft.t('redirectmate', 'Displaying {from} to {to} of {total} items', {
+                <p class="text-gray-500 mb-0">{{ Craft.t('redirectmate', '{from}-{to} of {total} redirects', {
                   from: ((serverParams.page - 1) * serverParams.perPage) + 1,
                   to: Math.min(serverParams.page * serverParams.perPage, totalCount),
                   total: totalCount
