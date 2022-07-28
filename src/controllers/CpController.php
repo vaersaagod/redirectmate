@@ -198,13 +198,17 @@ class CpController extends Controller
         $redirectModel->statusCode = $data['statusCode'];
 
         if (!$redirectModel->validate()) {
-            return $this->asFailure(Craft::t('redirectmate', 'Redirect validation failed.'), $redirectModel->getErrors());
+            return $this->asFailure(Craft::t('redirectmate', 'Redirect validation failed.'), [
+                'errors' => $redirectModel->getErrors(),
+            ]);
         } 
         
         $result = RedirectMate::getInstance()->redirect->addRedirect($redirectModel);
         
         if ($result->hasErrors()) {
-            return $this->asFailure(Craft::t('redirectmate', 'An error occurred when saving.'), $result->getErrors());
+            return $this->asFailure(Craft::t('redirectmate', 'An error occurred when saving.'), [
+                'errors' => $result->getErrors(),
+            ]);
         }
 
         // If we've a tracker, check it
