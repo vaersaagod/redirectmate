@@ -191,7 +191,7 @@ export default {
         <div class="flex w-100 justify-between">
             <div class="flex">
 
-                <div class="select">
+                <div class="select" v-if="sites && sites.length > 1">
                     <select v-model="serverParams.site" @change="updateTable">
                         <option value="all">{{ Craft.t('redirectmate', 'All sites' )}}</option>
                         <option v-for="item in sites" :value="item.id">{{ item.name }}</option>
