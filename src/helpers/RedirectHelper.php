@@ -94,7 +94,6 @@ class RedirectHelper
             ->all();
 
         foreach ($redirects as $redirect) {
-
             if ($redirect->matchBy === RedirectModel::MATCHBY_PATH) {
                 $target = $parsedUrlModel->parsedPath;
             } else {
@@ -170,10 +169,6 @@ class RedirectHelper
                 Craft::error($e->getMessage(), __METHOD__);
                 $redirectModel->addError('*', $e->getMessage());
             }
-        }
-
-        if (isset($result) && !!$result) {
-            CacheHelper::invalidateAllCaches();
         }
 
         return $redirectModel;
