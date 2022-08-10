@@ -137,18 +137,20 @@ class ElementUriWatcher extends Component
     {
 
         if (
-            !static::_shouldWatchElementUri($element) ||
-            empty(static::$_watchedElementUris["$element->id"])
+            !$element || 
+            !$element->id || 
+            empty(static::$_watchedElementUris[(string)$element->id]) || 
+            !static::_shouldWatchElementUri($element)
         ) {
             return;
         }
 
         $currentUris = static::_getElementSiteUris($element);
-        $oldUris = static::$_watchedElementUris["$element->id"];
+        $oldUris = static::$_watchedElementUris[(string)$element->id];
 
         foreach ($currentUris as $siteId => $currentUri) {
 
-            $oldUri = $oldUris["$siteId"] ?? null;
+            $oldUri = $oldUris[(string)$siteId] ?? null;
             if ($oldUri === null || strcmp($oldUri, $currentUri) === 0) {
                 continue;
             }
@@ -179,21 +181,6 @@ class ElementUriWatcher extends Component
             ]);
 
             RedirectMate::getInstance()->redirect->addRedirect($redirect);
-
-            // Update any existing redirects pointing to the old URI, to avoid additional redirects in cases where an element URI changes multiple times
-            $oldRedirects = RedirectModel::find()
-                ->where([
-                    'and',
-                    ['siteId' => $siteId],
-                    ['destinationElementId' => $element->id],
-                    ['destinationUrl' => $sourceUrl],
-                ])
-                ->all();
-
-            foreach ($oldRedirects as $oldRedirect) {
-                $oldRedirect->destinationUrl = $destinationUrl;
-                RedirectHelper::insertOrUpdateRedirect($oldRedirect);
-            }
         }
 
     }
@@ -230,7 +217,7 @@ class ElementUriWatcher extends Component
                 if (!$uri = Craft::$app->getElements()->getElementUriForSite($element->id, $site->id)) {
                     return $carry;
                 }
-                $carry["$site->id"] = $uri;
+                $carry[(string)$site->id] = $uri;
                 return $carry;
             }, []);
     }

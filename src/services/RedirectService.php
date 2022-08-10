@@ -119,6 +119,23 @@ class RedirectService extends Component
             }
         }
         
+        // Update any existing redirects pointing to the old URI, to avoid additional redirects in cases where an element URI changes multiple times
+        $oldRedirects = RedirectModel::find()
+            ->where(['destinationUrl' => $redirectModel->sourceUrl])
+            ->andWhere([
+                'or', [
+                    'siteId' => $redirectModel->siteId,
+                ], [
+                    'siteId' => null,
+                ]
+            ])
+            ->all();
+
+        foreach ($oldRedirects as $oldRedirect) {
+            $oldRedirect->destinationUrl = $redirectModel->destinationUrl;
+            RedirectHelper::insertOrUpdateRedirect($oldRedirect);
+        }
+        
         // Invalidate caches
         CacheHelper::invalidateAllCaches();
 
