@@ -59,7 +59,7 @@ class RedirectService extends Component
         }
 
         // Redirect
-        $response->redirect($destinationUrl, $redirect->statusCode)->send();
+        $response->redirect(UrlHelper::sanitizeUrl($destinationUrl), $redirect->statusCode)->send();
 
         try {
             Craft::$app->end();

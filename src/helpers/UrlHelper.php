@@ -26,7 +26,7 @@ class UrlHelper extends CraftUrlHelper
         $settings = RedirectMate::getInstance()->getSettings();
 
         $urlModel = new ParsedUrlModel();
-        $urlModel->url = $urlModel->parsedUrl = self::normalizeUrl(self::stripQueryString($request->getAbsoluteUrl()));
+        $urlModel->url = $urlModel->parsedUrl = self::normalizeUrl(self::stripQueryString(urldecode($request->getAbsoluteUrl())));
         $urlModel->path = $urlModel->parsedPath = self::normalizeUrl($request->getPathInfo());
         $urlModel->queryString = urldecode($request->getQueryStringWithoutPath());
 
@@ -128,5 +128,18 @@ class UrlHelper extends CraftUrlHelper
     public static function isUrl(string $url): bool
     {
         return self::isAbsoluteUrl($url) || self::isProtocolRelativeUrl($url);
+    }
+    
+    public static function sanitizeUrl(string $url): string
+    {
+        // HTML decode and strip out any tags
+        $url = html_entity_decode($url, ENT_NOQUOTES, 'UTF-8');
+        $url = urldecode($url);
+        $url = strip_tags($url);
+        
+        $url = preg_replace('/{.*}/', '', $url); // Remove twig
+        $url = (string)str_replace([PHP_EOL,"\r","\n",], '', $url); // Remove any linebreaks
+
+        return $url;
     }
 }
