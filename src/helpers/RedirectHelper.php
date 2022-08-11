@@ -4,6 +4,7 @@ namespace vaersaagod\redirectmate\helpers;
 
 use Craft;
 use craft\helpers\Db;
+use craft\helpers\StringHelper;
 use craft\models\Site;
 
 use vaersaagod\redirectmate\db\RedirectQuery;
@@ -140,32 +141,37 @@ class RedirectHelper
         }
     }
 
-    /**
-     * @param RedirectModel $redirectModel
-     *
-     * @return RedirectModel
-     */
+
     public static function insertOrUpdateRedirect(RedirectModel $redirectModel): RedirectModel
     {
 
-        $attributes = $redirectModel->getAttributes(null, ['uid', 'dateCreated', 'dateUpdated']);
+        $attributes = $redirectModel->getAttributes(null, ['uid', 'dateUpdated']);
         if (isset($redirectModel->lastHit)) {
             $attributes['lastHit'] = Db::prepareDateForDb($redirectModel->lastHit);
         }
+        if (isset($redirectModel->dateCreated)) {
+            $attributes['dateCreated'] = Db::prepareDateForDb($redirectModel->dateCreated);
+        }
 
         $db = Craft::$app->getDb();
+        $isNew = !isset($redirectModel->id);
 
-        if (isset($redirectModel->id)) {
+        if (!$isNew) {
             try {
-                $result = $db->createCommand()->update(RedirectQuery::TABLE, $attributes, ['id' => $redirectModel->id])->execute();
-            } catch (Exception $e) {
+                $db->createCommand()->update(RedirectQuery::TABLE, $attributes, ['id' => $redirectModel->id])->execute();
+            } catch (\Throwable $e) {
                 // Do not log, it's ok.
                 $redirectModel->addError('*', $e->getMessage());
             }
         } else {
+            // Give it a UID right away
+            if (!$redirectModel->uid) {
+                $redirectModel->uid = StringHelper::UUID();
+            }
             try {
-                $result = $db->createCommand()->insert(RedirectQuery::TABLE, $attributes)->execute();
-            } catch (Exception $e) {
+                $db->createCommand()->insert(RedirectQuery::TABLE, $attributes)->execute();
+                $redirectModel->id = $db->getLastInsertID();
+            } catch (\Throwable $e) {
                 Craft::error($e->getMessage(), __METHOD__);
                 $redirectModel->addError('*', $e->getMessage());
             }
