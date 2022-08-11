@@ -35,19 +35,22 @@ class Install extends Migration
         $this->driver = Craft::$app->getConfig()->getDb()->driver;
 
         if ($this->createTables()) {
+
             $this->createIndexes();
             $this->addForeignKeys();
+
             // Refresh the db schema caches
             Craft::$app->db->schema->refresh();
-        }
 
-        // Migrate Retour tables
-        try {
-            (new RetourMigration())->safeUp();
-        } catch (\Throwable $e) {
-            Craft::error($e->getMessage(), __METHOD__);
-            $this->safeDown();
-            return false;
+            // Migrate Retour tables
+            try {
+                (new RetourMigration())->safeUp();
+            } catch (\Throwable $e) {
+                Craft::error($e->getMessage(), __METHOD__);
+                $this->safeDown();
+                return false;
+            }
+
         }
 
         return true;
