@@ -57,10 +57,6 @@ class TrackerHelper
     {
         $settings = RedirectMate::getInstance()->getSettings();
         
-        if (!empty($request->getReferrer()) && str_contains($request->getReferrer(), 'redirectmate-utility')) {
-            return $trackerModel;
-        }
-
         if (in_array('ip', $settings->track, true)) {
             $trackerModel->remoteIp = $request->getUserIP();
         }
@@ -82,10 +78,10 @@ class TrackerHelper
      */
     public static function insertOrUpdateTracker(TrackerModel $trackerModel): void
     {
-
         $db = Craft::$app->getDb();
 
         $attributes = $trackerModel->getAttributes(null, ['uid', 'dateCreated', 'dateUpdated']);
+        
         if (isset($trackerModel->lastHit)) {
             $attributes['lastHit'] = Db::prepareDateForDb($trackerModel->lastHit);
         }

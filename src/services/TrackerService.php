@@ -55,8 +55,11 @@ class TrackerService extends Component
 
         // If this is not just an internal test, track it!
         if ($request->getUserAgent() !== UrlHelper::REDIRECTMATE_BOT_USER_AGENT) {
-            $trackerModel = TrackerHelper::populateModelWithRequestData($trackerModel, $request);
-            ++$trackerModel->hits;
+            if (!str_contains($request->getReferrer() ?? '', 'redirectmate-utility')) {
+                $trackerModel = TrackerHelper::populateModelWithRequestData($trackerModel, $request);
+                ++$trackerModel->hits;
+                $trackerModel->lastHit = new \DateTime();
+            }
         }
 
         // Get redirect
