@@ -82,6 +82,10 @@ class UrlHelper extends CraftUrlHelper
         if ($addTrailingSlashes === null) {
             $addTrailingSlashes = \Craft::$app->getConfig()->getGeneral()->addTrailingSlashesToUrls;
         }
+        
+        if ($pathOrUrl === '/') {
+            return $pathOrUrl;
+        }
 
         if (self::isUrl($pathOrUrl)) {
             $r = rtrim($pathOrUrl, '/');
