@@ -112,7 +112,12 @@ export default {
             }
             
             return this.Craft.getUrl(targetUrl.substring(1), null, site.baseUrl);
+        },
+        formatDateTime(dateTime) {
+            const date = new Date(dateTime);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
         }
+
     },
 
     mounted() {
@@ -184,10 +189,14 @@ export default {
                     <th>{{ Craft.t('redirectmate', 'Status') }}</th>
                     <th>{{ Craft.t('redirectmate', 'Destination URL') }}</th>
                     <th>{{ Craft.t('redirectmate', 'Site') }}</th>
-                    <th>{{ Craft.t('redirectmate', 'Match by') }}</th>
-                    <th>{{ Craft.t('redirectmate', 'Regexp?') }}</th>
                     <th>
                         <div class="text-right">{{ Craft.t('redirectmate', 'Hits') }}</div>
+                    </th>
+                    <th>
+                        <div class="text-center">{{ Craft.t('redirectmate', 'Match by') }}</div>
+                    </th>
+                    <th>
+                        <div class="text-center">{{ Craft.t('redirectmate', 'Regexp?') }}</div>
                     </th>
                     <th>{{ Craft.t('redirectmate', 'Last hit') }}</th>
                     <th>&nbsp;</th>
@@ -214,20 +223,24 @@ export default {
                         {{ getSiteName(item.siteId) }}
                     </td>
                     <td>
-                        {{ item.matchBy == 'fullurl' ? Craft.t('redirectmate', 'Full URL') : Craft.t('redirectmate', 'Path only') }}
-                    </td>
-                    <td>
-                        {{ item.isRegexp == true ? Craft.t('app', 'Yes') : Craft.t('app', 'No') }}
-                    </td>
-                    <td>
                         <div class="text-right">
                             {{ item.hits }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-center">
+                            {{ item.matchBy == 'fullurl' ? Craft.t('redirectmate', 'Full URL') : Craft.t('redirectmate', 'Path only') }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-center">
+                            {{ item.isRegexp == true ? Craft.t('app', 'Yes') : Craft.t('app', 'No') }}
                         </div>
                     </td>
                     <td :title="`${Craft.t('redirectmate', 'Created at: {date}', {
                         date: item.dateCreated
                     })}`">
-                        {{ item.lastHit }}
+                        {{ formatDateTime(item.lastHit) }}
                     </td>
                     <td>
                         <div class="text-right">

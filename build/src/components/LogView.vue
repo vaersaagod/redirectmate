@@ -157,7 +157,12 @@ export default {
         getItemSourceUrl(item) {
             const site = this.sites.find( ({ id }) => id === parseInt(item.siteId, 10));
             return this.Craft.getUrl(item.sourceUrl.substring(1), null, site.baseUrl);
+        },
+        formatDateTime(dateTime) {
+            const date = new Date(dateTime);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
         }
+        
     },
 
     mounted() {
@@ -242,7 +247,6 @@ export default {
                     <th>{{ Craft.t('redirectmate', 'Remote IP') }}</th>
                     <th>{{ Craft.t('redirectmate', 'User Agent') }}</th>
                     <th>{{ Craft.t('redirectmate', 'Referrer') }}</th>
-                    <!--<th>Last Hit</th>-->
                 </tr>
                 </thead>
 
@@ -260,7 +264,7 @@ export default {
                             <button v-if="!logItem.handled" @click="addRedirectForId(logItem.id)" class="btn small">{{ Craft.t('redirectmate', 'Fix') }}</button>
                         </div>
                     </td>
-                  <td :title="`${Craft.t('redirectmate', 'Last hit')}: ${logItem.lastHit}.\n${Craft.t('redirectmate', 'Created')}: ${logItem.dateCreated}`">
+                  <td :title="`${Craft.t('redirectmate', 'Last hit')}: ${formatDateTime(logItem.lastHit)}\n${Craft.t('redirectmate', 'Created')}: ${formatDateTime(logItem.dateCreated)}`">
                         <div class="text-center">
                             {{ logItem.hits }}
                         </div>
@@ -277,11 +281,6 @@ export default {
                     <td>
                         <a :href="logItem.referrer" v-if="logItem.referrer != null" class="inline-flex go gap-0"><span class="inline-block max-w-[180px] truncate">{{ logItem.referrer }}</span></a>
                     </td>
-                    <!--
-                    <td :title="'Created at: ' + logItem.dateCreated">
-                        {{ logItem.lastHit }}
-                    </td>
-                    -->
                 </tr>
                 </tbody>
             </table>
