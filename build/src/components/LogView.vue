@@ -160,6 +160,9 @@ export default {
             return this.Craft.getUrl(item.sourceUrl.substring(1), null, site.baseUrl);
         },
         formatDateTime(dateTime) {
+            if (!dateTime) {
+                return '';
+            }
             const date = new Date(dateTime);
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
         },
