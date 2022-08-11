@@ -18,6 +18,7 @@ export default {
             totalCount: null,
 
             sites: [],
+            settings: [],
 
             serverParams: {
                 page: 1,
@@ -161,20 +162,23 @@ export default {
         formatDateTime(dateTime) {
             const date = new Date(dateTime);
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        },
+        trackingEnabled(prop) {
+            return this.settings.track ? this.settings.track.includes(prop) : false;
         }
-        
     },
 
     mounted() {
         console.log('mounted');
 
-        const { sites, actions } = window.redirectMate;
+        const { sites, actions, settings } = window.redirectMate;
 
         if (sites && sites.length) {
             this.sites = sites;
         }
 
         this.actions = actions;
+        this.settings = settings;
 
         this.loadItems();
         Craft.initUiElements();
@@ -244,9 +248,9 @@ export default {
                     <th>
                         <div class="text-center">{{ Craft.t('redirectmate', 'Hits') }}</div>
                     </th>
-                    <th>{{ Craft.t('redirectmate', 'Remote IP') }}</th>
-                    <th>{{ Craft.t('redirectmate', 'User Agent') }}</th>
-                    <th>{{ Craft.t('redirectmate', 'Referrer') }}</th>
+                    <th v-if="trackingEnabled('ip')">{{ Craft.t('redirectmate', 'Remote IP') }}</th>
+                    <th v-if="trackingEnabled('useragent')">{{ Craft.t('redirectmate', 'User Agent') }}</th>
+                    <th v-if="trackingEnabled('referrer')">{{ Craft.t('redirectmate', 'Referrer') }}</th>
                 </tr>
                 </thead>
 
@@ -269,16 +273,16 @@ export default {
                             {{ logItem.hits }}
                         </div>
                     </td>
-                    <td>
+                    <td v-if="trackingEnabled('ip')">
                         <span v-if="logItem.remoteIp === '127.0.0.1'" class="inline-block">{{ logItem.remoteIp }}</span>
                         <a v-if="logItem.remoteIp !== '127.0.0.1'" class="inline-block go" :href="'https://whatismyipaddress.com/ip/' + logItem.remoteIp" target="_blank">{{ logItem.remoteIp }}</a>
                     </td>
-                    <td :title="logItem.userAgent">
+                    <td :title="logItem.userAgent"  v-if="trackingEnabled('useragent')">
                         <span class="capitalize" v-if="isUaBot(logItem.userAgent)">{{ getBot(logItem.userAgent) }}</span>
                         <span v-else>{{ getBrowser(logItem.userAgent) }}</span>
 
                     </td>
-                    <td>
+                    <td v-if="trackingEnabled('referrer')">
                         <a :href="logItem.referrer" v-if="logItem.referrer != null" class="inline-flex go gap-0"><span class="inline-block max-w-[180px] truncate">{{ logItem.referrer }}</span></a>
                     </td>
                 </tr>
