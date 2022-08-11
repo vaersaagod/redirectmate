@@ -26,45 +26,9 @@ class UrlHelper extends CraftUrlHelper
         $settings = RedirectMate::getInstance()->getSettings();
 
         $urlModel = new ParsedUrlModel();
-        $urlModel->url = $urlModel->parsedUrl = self::normalizeUrl(self::stripQueryString(urldecode($request->getAbsoluteUrl())));
-        $urlModel->path = $urlModel->parsedPath = self::normalizeUrl($request->getPathInfo());
+        $urlModel->url = $urlModel->parsedUrl = self::normalizeUrl(self::stripQueryString(urldecode($request->getAbsoluteUrl())), false);
+        $urlModel->path = $urlModel->parsedPath = self::normalizeUrl($request->getPathInfo(), false);
         $urlModel->queryString = urldecode($request->getQueryStringWithoutPath());
-
-        $queryStringParams = $request->getQueryParams();
-        unset($queryStringParams['p']);
-
-        if ($settings->trackQueryString === true && count($queryStringParams) > 0) {
-            ksort($queryStringParams);
-            $queryString = urldecode(http_build_query($queryStringParams));
-        }
-
-        if (is_array($settings->trackQueryString) && count($queryStringParams) > 0 && count($settings->trackQueryString) > 0) {
-            $filteredParams = array_filter($queryStringParams, static function($k) use (&$settings) {
-                return in_array($k, $settings->trackQueryString, true);
-            }, ARRAY_FILTER_USE_KEY);
-
-            ksort($filteredParams);
-            $queryString = urldecode(http_build_query($filteredParams));
-        }
-
-        if (!empty($queryString)) {
-            $urlModel->parsedPath = $urlModel->path.'?'.$queryString;
-            $urlModel->parsedUrl = $urlModel->url.'?'.$queryString;
-        }
-
-        return $urlModel;
-    }
-
-    public static function parseUrl(string $url): ParsedUrlModel
-    {
-        $settings = RedirectMate::getInstance()->getSettings();
-
-        $urlModel = new ParsedUrlModel();
-        $urlModel->url = $urlModel->parsedUrl = self::normalizeUrl(self::stripQueryString($url));
-        $urlModel->path = $urlModel->parsedPath = self::normalizeUrl(parse_url($url, PHP_URL_PATH));
-        $urlModel->queryString = urldecode(parse_url($url, PHP_URL_QUERY));
-
-        $request = \Craft::$app->getRequest();
 
         $queryStringParams = $request->getQueryParams();
         unset($queryStringParams['p']);
@@ -108,13 +72,16 @@ class UrlHelper extends CraftUrlHelper
     /**
      * Overrides the internal normalizePath
      *
-     * @param string $pathOrUrl
+     * @param string    $pathOrUrl
+     * @param bool|null $addTrailingSlashes
      *
      * @return string
      */
-    public static function normalizeUrl(string $pathOrUrl): string
+    public static function normalizeUrl(string $pathOrUrl, ?bool $addTrailingSlashes = null): string
     {
-        $addTrailingSlashes = \Craft::$app->getConfig()->getGeneral()->addTrailingSlashesToUrls;
+        if ($addTrailingSlashes === null) {
+            $addTrailingSlashes = \Craft::$app->getConfig()->getGeneral()->addTrailingSlashesToUrls;
+        }
 
         if (self::isUrl($pathOrUrl)) {
             $r = rtrim($pathOrUrl, '/');
@@ -125,11 +92,21 @@ class UrlHelper extends CraftUrlHelper
         return $r.($addTrailingSlashes ? '/' : '');
     }
 
+    /**
+     * @param string $url
+     *
+     * @return bool
+     */
     public static function isUrl(string $url): bool
     {
         return self::isAbsoluteUrl($url) || self::isProtocolRelativeUrl($url);
     }
-    
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
     public static function sanitizeUrl(string $url): string
     {
         // HTML decode and strip out any tags

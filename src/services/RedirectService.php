@@ -74,6 +74,15 @@ class RedirectService extends Component
      */
     public function addRedirect(RedirectModel $redirectModel): RedirectModel
     {
+        // Normalize slashes. Always without trailing in the db.
+        if (!$redirectModel->isRegexp) {
+            $redirectModel->sourceUrl = UrlHelper::normalizeUrl($redirectModel->sourceUrl, false);
+        }
+        
+        if (!UrlHelper::isUrl($redirectModel->destinationUrl)) {
+            $redirectModel->destinationUrl = UrlHelper::normalizeUrl($redirectModel->destinationUrl, false);
+        }
+        
         // Check if we already have a redirect with this source URL and site ID, if so, update it.
         $query = RedirectModel::find()
             ->where(['sourceUrl' => $redirectModel->sourceUrl]);
