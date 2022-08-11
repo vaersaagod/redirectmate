@@ -55,6 +55,9 @@ class CpController extends Controller
             case 'lasthit':
                 $query->orderBy('lastHit DESC');
                 break;
+            case 'newest':
+                $query->orderBy('dateCreated DESC');
+                break;
             default:
                 $query->orderBy('hits DESC');
                 break;
