@@ -235,7 +235,7 @@ export default {
     <div @click="closeCallback()" class="fixed full flex justify-center modal-shade z-99 flex" v-if="isVisible">
         <form @click.stop="" class="relative flex flex-col bg-white justify-between w-[calc(100%-16px)] max-w-[550px] rounded-5px overflow-hidden modal-box-shadow">
             <div class="w-100 p-30">
-                <h1>{{ Craft.t('redirectmate', 'Create redirect') }}</h1>
+                <h1>{{ mode == 'edit' ? Craft.t('redirectmate', 'Edit redirect') : Craft.t('redirectmate', 'Create redirect') }}</h1>
                 <div>
                     <div class="field">
                         <div class="heading">

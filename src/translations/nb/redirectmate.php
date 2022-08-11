@@ -25,6 +25,7 @@ return [
     'Destination URL' => 'Til URL',
     'Display' => 'Vis',
     'Edit' => 'Rediger',
+    'Edit redirect' => 'Rediger peker',
     'Enabled' => 'Aktivert',
     'Exact Match' => 'Eksakt match',
     'Export' => 'Eksportér',

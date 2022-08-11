@@ -25,6 +25,7 @@ return [
     'Destination URL' => 'Destination URL',
     'Display' => 'Display',
     'Edit' => 'Edit',
+    'Edit redirect' => 'Edit redirect',
     'Enabled' => 'Enabled',
     'Exact Match' => 'Exact Match',
     'Export' => 'Export',
