@@ -219,23 +219,17 @@ export default {
                                 <span v-if="item.isRegexp">{{ item.destinationUrl }}</span>
                                 <a v-else :href="getItemUrl(item, item.destinationUrl)" class="go" target="_blank">{{ item.destinationUrl }}</a>
                             </td>
-                            <td>
+                            <td class="whitespace-nowrap">
                                 {{ getSiteName(item.siteId) }}
                             </td>
-                            <td>
-                                <div class="text-right">
-                                    {{ item.hits }}
-                                </div>
+                            <td class="text-right">
+                                {{ item.hits }}
                             </td>
-                            <td>
-                                <div class="text-center">
-                                    {{ item.matchBy == 'fullurl' ? Craft.t('redirectmate', 'Full URL') : Craft.t('redirectmate', 'Path only') }}
-                                </div>
+                            <td class="text-center whitespace-nowrap">
+                                {{ item.matchBy == 'fullurl' ? Craft.t('redirectmate', 'Full URL') : Craft.t('redirectmate', 'Path only') }}
                             </td>
-                            <td>
-                                <div class="text-center">
-                                    {{ item.isRegexp == true ? Craft.t('redirectmate', 'Yes') : Craft.t('redirectmate', 'No') }}
-                                </div>
+                            <td class="text-center whitespace-nowrap">
+                                {{ item.isRegexp == true ? Craft.t('redirectmate', 'Yes') : Craft.t('redirectmate', 'No') }}
                             </td>
                             <td :title="`${Craft.t('redirectmate', 'Created at: {date}', {
                                 date: item.dateCreated

@@ -284,7 +284,7 @@ export default {
 
                           </td>
                           <td v-if="trackingEnabled('referrer')">
-                              <a :href="logItem.referrer" v-if="logItem.referrer != null" class="inline-flex go gap-0"><span class="inline-block max-w-[180px] truncate">{{ logItem.referrer }}</span></a>
+                              <a :href="logItem.referrer" v-if="logItem.referrer != null" class="inline-flex go gap-0"><span class="inline-block max-w-[180px] truncate" :title="logItem.referrer">{{ logItem.referrer }}</span></a>
                           </td>
                       </tr>
                   </tbody>
