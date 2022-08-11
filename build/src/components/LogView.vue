@@ -239,55 +239,57 @@ export default {
         </div>
 
         <div class="w-100" v-if="items && items.length > 0">
-            <table class="data w-100 mt-20">
-                <thead>
-                <tr>
-                    <th class="checkbox-column"><input type="checkbox" v-model="selectAll" class="relative top-2px"></th>
-                    <th>{{ Craft.t('redirectmate', 'Source URL') }}</th>
-                    <th>&nbsp;</th>
-                    <th>
-                        <div class="text-center">{{ Craft.t('redirectmate', 'Hits') }}</div>
-                    </th>
-                    <th v-if="trackingEnabled('ip')">{{ Craft.t('redirectmate', 'Remote IP') }}</th>
-                    <th v-if="trackingEnabled('useragent')">{{ Craft.t('redirectmate', 'User Agent') }}</th>
-                    <th v-if="trackingEnabled('referrer')">{{ Craft.t('redirectmate', 'Referrer') }}</th>
-                </tr>
-                </thead>
+            <div class="tableview tablepane mt-20">
+              <table class="data fullwidth w-100">
+                  <thead>
+                      <tr>
+                          <th class="checkbox-column"><input type="checkbox" v-model="selectAll" class="relative top-2px"></th>
+                          <th>{{ Craft.t('redirectmate', 'Source URL') }}</th>
+                          <th>&nbsp;</th>
+                          <th>
+                              <div class="text-center">{{ Craft.t('redirectmate', 'Hits') }}</div>
+                          </th>
+                          <th v-if="trackingEnabled('ip')">{{ Craft.t('redirectmate', 'Remote IP') }}</th>
+                          <th v-if="trackingEnabled('useragent')">{{ Craft.t('redirectmate', 'User Agent') }}</th>
+                          <th v-if="trackingEnabled('referrer')">{{ Craft.t('redirectmate', 'Referrer') }}</th>
+                      </tr>
+                  </thead>
 
-                <tbody>
-                <tr class="group" v-for="logItem in items" :key="'logItem' + logItem.id">
-                    <td>
-                        <input type="checkbox" v-model="selectedItems" :value="logItem.id" class="relative top-2px">
-                    </td>
-                    <td>
-                        <span class="status-dot inline-block w-10px h-10px rounded-100 mr-10" :class="{ 'bg-green-600': logItem.handled || newlyHandledItems.includes(logItem.id), 'bg-red-600': !logItem.handled && !newlyHandledItems.includes(logItem.id), 'is-checking': checkingItems.includes(logItem.id) }" :title="logItem.handled ? Craft.t('redirectmate', 'Handled') : Craft.t('redirectmate', 'Not handled')"></span>
-                        <a :href="getItemSourceUrl(logItem)" class="go" target="_blank">{{ logItem.sourceUrl }}</a>
-                    </td>
-                    <td>
-                        <div class="text-right">
-                            <button v-if="!logItem.handled" @click="addRedirectForId(logItem.id)" class="btn small">{{ Craft.t('redirectmate', 'Fix') }}</button>
-                        </div>
-                    </td>
-                  <td :title="`${Craft.t('redirectmate', 'Last hit')}: ${formatDateTime(logItem.lastHit)}\n${Craft.t('redirectmate', 'Created')}: ${formatDateTime(logItem.dateCreated)}`">
-                        <div class="text-center">
-                            {{ logItem.hits }}
-                        </div>
-                    </td>
-                    <td v-if="trackingEnabled('ip')">
-                        <span v-if="logItem.remoteIp === '127.0.0.1'" class="inline-block">{{ logItem.remoteIp }}</span>
-                        <a v-if="logItem.remoteIp !== '127.0.0.1'" class="inline-block go" :href="'https://whatismyipaddress.com/ip/' + logItem.remoteIp" target="_blank">{{ logItem.remoteIp }}</a>
-                    </td>
-                    <td :title="logItem.userAgent"  v-if="trackingEnabled('useragent')">
-                        <span class="capitalize" v-if="isUaBot(logItem.userAgent)">{{ getBot(logItem.userAgent) }}</span>
-                        <span v-else>{{ getBrowser(logItem.userAgent) }}</span>
+                  <tbody>
+                      <tr class="group" v-for="logItem in items" :key="'logItem' + logItem.id">
+                          <td>
+                              <input type="checkbox" v-model="selectedItems" :value="logItem.id" class="relative top-2px">
+                          </td>
+                          <td class="break-all">
+                              <span class="status-dot inline-block w-10px h-10px rounded-100 mr-10" :class="{ 'bg-green-600': logItem.handled || newlyHandledItems.includes(logItem.id), 'bg-red-600': !logItem.handled && !newlyHandledItems.includes(logItem.id), 'is-checking': checkingItems.includes(logItem.id) }" :title="logItem.handled ? Craft.t('redirectmate', 'Handled') : Craft.t('redirectmate', 'Not handled')"></span>
+                              <a :href="getItemSourceUrl(logItem)" class="go" target="_blank">{{ logItem.sourceUrl }}</a>
+                          </td>
+                          <td>
+                              <div class="text-right">
+                                  <button v-if="!logItem.handled" @click="addRedirectForId(logItem.id)" class="btn small">{{ Craft.t('redirectmate', 'Fix') }}</button>
+                              </div>
+                          </td>
+                          <td :title="`${Craft.t('redirectmate', 'Last hit')}: ${formatDateTime(logItem.lastHit)}\n${Craft.t('redirectmate', 'Created')}: ${formatDateTime(logItem.dateCreated)}`">
+                              <div class="text-center">
+                                  {{ logItem.hits }}
+                              </div>
+                          </td>
+                          <td v-if="trackingEnabled('ip')">
+                              <span v-if="logItem.remoteIp === '127.0.0.1'" class="inline-block">{{ logItem.remoteIp }}</span>
+                              <a v-if="logItem.remoteIp !== '127.0.0.1'" class="inline-block go" :href="'https://whatismyipaddress.com/ip/' + logItem.remoteIp" target="_blank">{{ logItem.remoteIp }}</a>
+                          </td>
+                          <td :title="logItem.userAgent"  v-if="trackingEnabled('useragent')">
+                              <span class="capitalize" v-if="isUaBot(logItem.userAgent)">{{ getBot(logItem.userAgent) }}</span>
+                              <span v-else>{{ getBrowser(logItem.userAgent) }}</span>
 
-                    </td>
-                    <td v-if="trackingEnabled('referrer')">
-                        <a :href="logItem.referrer" v-if="logItem.referrer != null" class="inline-flex go gap-0"><span class="inline-block max-w-[180px] truncate">{{ logItem.referrer }}</span></a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                          </td>
+                          <td v-if="trackingEnabled('referrer')">
+                              <a :href="logItem.referrer" v-if="logItem.referrer != null" class="inline-flex go gap-0"><span class="inline-block max-w-[180px] truncate">{{ logItem.referrer }}</span></a>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+            </div>
 
             <div class="mt-40 flex justify-between">
               <p class="text-gray-500 mb-0">{{ Craft.t('redirectmate', '{from}-{to} of {total} errors', {

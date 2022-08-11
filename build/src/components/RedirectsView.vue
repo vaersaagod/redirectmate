@@ -180,75 +180,77 @@ export default {
         </div>
 
         <div class="w-100" v-if="items && items.length > 0">
-            <table class="data w-100 mt-20">
-                <thead>
-                <tr>
-                    <th class="checkbox-column"><input type="checkbox" v-model="selectAll" class="relative top-2px"></th>
-                    <th>{{ Craft.t('redirectmate', 'Source URL') }}</th>
-                    <th>{{ Craft.t('redirectmate', 'Status') }}</th>
-                    <th>{{ Craft.t('redirectmate', 'Destination URL') }}</th>
-                    <th>{{ Craft.t('redirectmate', 'Site') }}</th>
-                    <th>
-                        <div class="text-right">{{ Craft.t('redirectmate', 'Hits') }}</div>
-                    </th>
-                    <th>
-                        <div class="text-center">{{ Craft.t('redirectmate', 'Match by') }}</div>
-                    </th>
-                    <th>
-                        <div class="text-center">{{ Craft.t('redirectmate', 'Regexp?') }}</div>
-                    </th>
-                    <th>{{ Craft.t('redirectmate', 'Last hit') }}</th>
-                    <th>&nbsp;</th>
-                </tr>
-                </thead>
+            <div class="tableview tablepane mt-20">
+                <table class="data w-100">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-column"><input type="checkbox" v-model="selectAll" class="relative top-2px"></th>
+                            <th>{{ Craft.t('redirectmate', 'Source URL') }}</th>
+                            <th>{{ Craft.t('redirectmate', 'Status') }}</th>
+                            <th>{{ Craft.t('redirectmate', 'Destination URL') }}</th>
+                            <th>{{ Craft.t('redirectmate', 'Site') }}</th>
+                            <th>
+                                <div class="text-right">{{ Craft.t('redirectmate', 'Hits') }}</div>
+                            </th>
+                            <th>
+                                <div class="text-center">{{ Craft.t('redirectmate', 'Match by') }}</div>
+                            </th>
+                            <th>
+                                <div class="text-center">{{ Craft.t('redirectmate', 'Regexp?') }}</div>
+                            </th>
+                            <th>{{ Craft.t('redirectmate', 'Last hit') }}</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
 
-                <tbody>
-                <tr class="group" v-for="item in items" :key="'redirectItem' + item.id">
-                    <td>
-                        <input type="checkbox" v-model="selectedItems" :value="item.id" class="relative top-2px">
-                    </td>
-                    <td>
-                        <span v-if="item.isRegexp">{{ item.sourceUrl }}</span>
-                        <a v-else :href="getItemUrl(item, item.sourceUrl)" class="go" target="_blank">{{ item.sourceUrl }}</a>
-                    </td>
-                    <td>
-                        {{ item.statusCode }}
-                    </td>
-                    <td>
-                        <span v-if="item.isRegexp">{{ item.destinationUrl }}</span>
-                        <a v-else :href="getItemUrl(item, item.destinationUrl)" class="go" target="_blank">{{ item.destinationUrl }}</a>
-                    </td>
-                    <td>
-                        {{ getSiteName(item.siteId) }}
-                    </td>
-                    <td>
-                        <div class="text-right">
-                            {{ item.hits }}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-center">
-                            {{ item.matchBy == 'fullurl' ? Craft.t('redirectmate', 'Full URL') : Craft.t('redirectmate', 'Path only') }}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-center">
-                            {{ item.isRegexp == true ? Craft.t('redirectmate', 'Yes') : Craft.t('redirectmate', 'No') }}
-                        </div>
-                    </td>
-                    <td :title="`${Craft.t('redirectmate', 'Created at: {date}', {
-                        date: item.dateCreated
-                    })}`">
-                        {{ formatDateTime(item.lastHit) }}
-                    </td>
-                    <td>
-                        <div class="text-right">
-                            <button @click="editRedirect(item.id)" class="btn small">{{ Craft.t('redirectmate', 'Edit') }}</button>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                    <tbody>
+                        <tr class="group" v-for="item in items" :key="'redirectItem' + item.id">
+                            <td>
+                                <input type="checkbox" v-model="selectedItems" :value="item.id" class="relative top-2px">
+                            </td>
+                            <td class="break-all">
+                                <span v-if="item.isRegexp">{{ item.sourceUrl }}</span>
+                                <a v-else :href="getItemUrl(item, item.sourceUrl)" class="go" target="_blank">{{ item.sourceUrl }}</a>
+                            </td>
+                            <td>
+                                {{ item.statusCode }}
+                            </td>
+                            <td class="break-all">
+                                <span v-if="item.isRegexp">{{ item.destinationUrl }}</span>
+                                <a v-else :href="getItemUrl(item, item.destinationUrl)" class="go" target="_blank">{{ item.destinationUrl }}</a>
+                            </td>
+                            <td>
+                                {{ getSiteName(item.siteId) }}
+                            </td>
+                            <td>
+                                <div class="text-right">
+                                    {{ item.hits }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-center">
+                                    {{ item.matchBy == 'fullurl' ? Craft.t('redirectmate', 'Full URL') : Craft.t('redirectmate', 'Path only') }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-center">
+                                    {{ item.isRegexp == true ? Craft.t('redirectmate', 'Yes') : Craft.t('redirectmate', 'No') }}
+                                </div>
+                            </td>
+                            <td :title="`${Craft.t('redirectmate', 'Created at: {date}', {
+                                date: item.dateCreated
+                            })}`">
+                                {{ formatDateTime(item.lastHit) }}
+                            </td>
+                            <td>
+                                <div class="text-right">
+                                    <button @click="editRedirect(item.id)" class="btn small">{{ Craft.t('redirectmate', 'Edit') }}</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <div class="mt-40 flex justify-between">
                 <p class="text-gray-500 mb-0">{{ Craft.t('redirectmate', '{from}-{to} of {total} redirects', {
