@@ -184,7 +184,7 @@ export default {
 
             this.$axios.post(window.redirectMate.actions.addRedirect, { redirectData: this.currentData })
                 .then(({ data }) => {
-                    console.log(data);
+                    console.log('>> data: ', data);
 
                     this.errorMessage = null;
                     this.errors = null;
@@ -206,6 +206,14 @@ export default {
                     }
 
                     this.isLoading = false;
+
+                    window.Craft.cp.displaySuccess(
+                        Craft.t('redirectmate', 'Redirect saved.'),
+                        {
+                            details: `<a href="${data.sourceUrl}" class="go break-all" target="_blank" rel="noopener noreferrer">${data.sourceUrl}</a>`
+                        }
+                    );
+
                 })
                 .catch(error => {
                     console.error(error);
