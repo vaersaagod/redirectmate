@@ -141,7 +141,11 @@ class RedirectHelper
         }
     }
 
-
+    /**
+     * @param RedirectModel $redirectModel
+     * @return RedirectModel
+     * @throws \Exception
+     */
     public static function insertOrUpdateRedirect(RedirectModel $redirectModel): RedirectModel
     {
 
@@ -166,7 +170,7 @@ class RedirectHelper
         } else {
             // Give it a UID right away
             if (!$redirectModel->uid) {
-                $redirectModel->uid = StringHelper::UUID();
+                $redirectModel->uid = $attributes['uid'] = StringHelper::UUID();
             }
             try {
                 $db->createCommand()->insert(RedirectQuery::TABLE, $attributes)->execute();
