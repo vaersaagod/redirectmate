@@ -44,14 +44,15 @@ class ElementUriWatcher extends Component
     public function watchElementUris(): void
     {
 
-        if (
-            isset(static::$_watchedElementUris) ||
-            !RedirectMate::getInstance()->getSettings()->autoCreateElementRedirects
-        ) {
+        if (isset(static::$_watchedElementUris)) {
             return;
         }
 
         static::$_watchedElementUris = [];
+
+        if (!RedirectMate::getInstance()->getSettings()->autoCreateElementRedirects) {
+            return;
+        }
 
         // Cache the "Match by" setting for element auto-redirects
         if (RedirectMate::getInstance()->getSettings()->autoCreateElementRedirectsMatchBy === RedirectModel::MATCHBY_FULLURL) {
@@ -119,11 +120,14 @@ class ElementUriWatcher extends Component
     private static function _maybeWatchElementUri(?ElementInterface $element): void
     {
         if (
-            !static::_shouldWatchElementUri($element) ||
-            isset(static::$_watchedElementUris["$element->id"])) {
+            !$element ||
+            !$element->id ||
+            isset(static::$_watchedElementUris[(string)$element->id]) ||
+            !static::_shouldWatchElementUri($element)
+        ) {
             return;
         }
-        static::$_watchedElementUris["$element->id"] = static::_getElementSiteUris($element);
+        static::$_watchedElementUris[(string)$element->id] = static::_getElementSiteUris($element);
     }
 
     /**
