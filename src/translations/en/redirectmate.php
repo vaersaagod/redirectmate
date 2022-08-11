@@ -39,6 +39,7 @@ return [
     'Match by' => 'Match by',
     'New redirect' => 'New redirect',
     'Newest' => 'Newest',
+    'No' => 'No',
     'No errors have been logged.' => 'No errors have been logged.',
     'No log items to delete.' => 'No log items to delete.',
     'No more unhandled errors!' => 'No more unhandled errors!',
@@ -64,4 +65,5 @@ return [
     'Unknown' => 'Unknown',
     'URL checked' => 'URL checked',
     'User Agent' => 'User Agent',
+    'Yes' => 'Yes',
 ];

@@ -39,6 +39,7 @@ return [
     'Match by' => 'Match på',
     'New redirect' => 'Ny videresending',
     'Newest' => 'Nyeste',
+    'No' => 'Nei',
     'No errors have been logged.' => 'Ingen feil har blitt logget.',
     'No log items to delete.' => 'Ingen loggoppføringer å slette.',
     'No more unhandled errors!' => 'Ingen flere uhåndterte feil!',
@@ -64,4 +65,5 @@ return [
     'Unknown' => 'Ukjent',
     'URL checked' => 'URL sjekket',
     'User Agent' => 'Brukeragent',
+    'Yes' => 'Ja',
 ];

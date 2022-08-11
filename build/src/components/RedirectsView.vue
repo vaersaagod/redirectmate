@@ -233,7 +233,7 @@ export default {
                     </td>
                     <td>
                         <div class="text-center">
-                            {{ item.isRegexp == true ? Craft.t('app', 'Yes') : Craft.t('app', 'No') }}
+                            {{ item.isRegexp == true ? Craft.t('redirectmate', 'Yes') : Craft.t('redirectmate', 'No') }}
                         </div>
                     </td>
                     <td :title="`${Craft.t('redirectmate', 'Created at: {date}', {
