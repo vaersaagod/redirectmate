@@ -71,11 +71,15 @@ export default {
                 return;
             }
             this.$nextTick(this.focusToFirstErrorInput);
+        },
+        currentData(newValue) {
+          console.log({newValue});
         }
     },
     methods: {
         openElementSelect() {
             const modal = window.Craft.createElementSelectorModal('craft\\elements\\Entry', {
+                defaultSiteId: this.currentData.site != 'all' ? this.currentData.site : null,
                 onSelect: e => {
                     const url = new URL(e[0].url);
                     this.currentData.destinationUrl = url.pathname;
