@@ -9,6 +9,10 @@
 }
 
 .redirectmate-utility {
+    td, th {
+        vertical-align: top;
+    }
+    
     .checkbox-column {
         width: 30px !important;
     }

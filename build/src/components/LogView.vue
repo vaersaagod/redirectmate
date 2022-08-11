@@ -267,7 +267,7 @@ export default {
                     </td>
                     <td>
                         <span v-if="logItem.remoteIp === '127.0.0.1'" class="inline-block">{{ logItem.remoteIp }}</span>
-                        <a v-if="logItem.remoteIp !== '127.0.0.1'" class="inline-block" :href="'https://whatismyipaddress.com/ip/' + logItem.remoteIp" target="_blank">{{ logItem.remoteIp }}</a>
+                        <a v-if="logItem.remoteIp !== '127.0.0.1'" class="inline-block go" :href="'https://whatismyipaddress.com/ip/' + logItem.remoteIp" target="_blank">{{ logItem.remoteIp }}</a>
                     </td>
                     <td :title="logItem.userAgent">
                         <span class="capitalize" v-if="isUaBot(logItem.userAgent)">{{ getBot(logItem.userAgent) }}</span>
@@ -275,7 +275,7 @@ export default {
 
                     </td>
                     <td>
-                        {{ logItem.referrer }}
+                        <a :href="logItem.referrer" v-if="logItem.referrer != null" class="inline-flex go gap-0"><span class="inline-block max-w-[180px] truncate">{{ logItem.referrer }}</span></a>
                     </td>
                     <!--
                     <td :title="'Created at: ' + logItem.dateCreated">
