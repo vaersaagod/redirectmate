@@ -5,6 +5,8 @@ namespace vaersaagod\redirectmate\migrations;
 use Craft;
 use craft\db\Migration;
 
+use vaersaagod\redirectmate\helpers\CacheHelper;
+
 class Install extends Migration
 {
     /**
@@ -27,13 +29,25 @@ class Install extends Migration
      */
     public function safeUp(): bool
     {
+
+        CacheHelper::invalidateAllCaches();
+
         $this->driver = Craft::$app->getConfig()->getDb()->driver;
+
         if ($this->createTables()) {
             $this->createIndexes();
             $this->addForeignKeys();
             // Refresh the db schema caches
             Craft::$app->db->schema->refresh();
-            $this->insertDefaultData();
+        }
+
+        // Migrate Retour tables
+        try {
+            (new RetourMigration())->safeUp();
+        } catch (\Throwable $e) {
+            Craft::error($e->getMessage(), __METHOD__);
+            $this->safeDown();
+            return false;
         }
 
         return true;
@@ -69,7 +83,7 @@ class Install extends Migration
     {
         $tablesCreated = false;
 
-        // tracker table
+        // Tracker table (log)
         $trackerTableSchema = Craft::$app->db->schema->getTableSchema('{{%redirectmate_tracker}}');
 
         if ($trackerTableSchema === null) {
@@ -95,7 +109,7 @@ class Install extends Migration
             );
         }
 
-        // redirect table
+        // Redirects table
         $redirectsTableSchema = Craft::$app->db->schema->getTableSchema('{{%redirectmate_redirects}}');
 
         if ($redirectsTableSchema === null) {
@@ -127,60 +141,46 @@ class Install extends Migration
     }
 
     /**
-     * Creates the indexes needed for the Records used by the plugin
-     *
      * @return void
      */
     protected function createIndexes(): void
     {
         $this->createIndex(
-            $this->db->getIndexName('{{%redirectmate_tracker}}', 'siteId', true),
+            $this->db->getIndexName(),
             '{{%redirectmate_tracker}}',
             'siteId',
             false
         );
 
         $this->createIndex(
-            $this->db->getIndexName('{{%redirectmate_tracker}}', 'sourceUrl', true),
+            $this->db->getIndexName(),
             '{{%redirectmate_tracker}}',
             'sourceUrl',
             false
         );
 
         $this->createIndex(
-            $this->db->getIndexName('{{%redirectmate_tracker}}', 'sourceUrl', true),
+            $this->db->getIndexName(),
             '{{%redirectmate_tracker}}',
             ['sourceUrl', 'siteId'],
             true
         );
 
         $this->createIndex(
-            $this->db->getIndexName('{{%redirectmate_redirects}}', 'siteId', true),
+            $this->db->getIndexName(),
             '{{%redirectmate_redirects}}',
             'siteId',
             false
         );
-
-        // Additional commands depending on the db driver
-        /*
-        switch ($this->driver) {
-            case Connection::DRIVER_MYSQL:
-                break;
-            case Connection::DRIVER_PGSQL:
-                break;
-        }
-        */
     }
 
     /**
-     * Creates the foreign keys needed for the Records used by the plugin
-     *
      * @return void
      */
     protected function addForeignKeys(): void
     {
         $this->addForeignKey(
-            $this->db->getForeignKeyName('{{%redirectmate_tracker}}', 'siteId'),
+            $this->db->getForeignKeyName(),
             '{{%redirectmate_tracker}}',
             'siteId',
             '{{%sites}}',
@@ -190,7 +190,7 @@ class Install extends Migration
         );
 
         $this->addForeignKey(
-            $this->db->getForeignKeyName('{{%redirectmate_redirects}}', 'siteId'),
+            $this->db->getForeignKeyName(),
             '{{%redirectmate_redirects}}',
             'siteId',
             '{{%sites}}',
@@ -200,7 +200,7 @@ class Install extends Migration
         );
 
         $this->addForeignKey(
-            $this->db->getForeignKeyName('{{%redirectmate_redirects}}', 'destinationElementId'),
+            $this->db->getForeignKeyName(),
             '{{%redirectmate_redirects}}',
             'destinationElementId',
             '{{%elements}}',
@@ -211,17 +211,6 @@ class Install extends Migration
     }
 
     /**
-     * Populates the DB with the default data.
-     *
-     * @return void
-     */
-    protected function insertDefaultData(): void
-    {
-    }
-
-    /**
-     * Removes the tables needed for the Records used by the plugin
-     *
      * @return void
      */
     protected function removeTables(): void
