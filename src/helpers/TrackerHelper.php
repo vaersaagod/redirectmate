@@ -57,6 +57,10 @@ class TrackerHelper
     {
         $settings = RedirectMate::getInstance()->getSettings();
         
+        if (!empty($request->getReferrer()) && str_contains($request->getReferrer(), 'redirectmate-utility')) {
+            return $trackerModel;
+        }
+
         if (in_array('ip', $settings->track, true)) {
             $trackerModel->remoteIp = $request->getUserIP();
         }
