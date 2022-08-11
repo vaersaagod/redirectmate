@@ -237,7 +237,7 @@ export default {
             <div class="w-100 p-30">
                 <h1>{{ mode == 'edit' ? Craft.t('redirectmate', 'Edit redirect') : Craft.t('redirectmate', 'Create redirect') }}</h1>
                 <div>
-                    <div class="field">
+                    <div class="field" v-if="sites && sites.length > 1">
                         <div class="heading">
                             <label>{{ Craft.t('redirectmate', 'Site') }}</label>
                         </div>
