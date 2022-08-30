@@ -27,11 +27,6 @@ export default {
             return !this.totalCount || this.currentPage >= this.totalPages;
         }
     },
-    watch: {
-        currentPage() {
-            window.scrollTo(0, 0);
-        }
-    },
     emits: [
       'perPageChange',
       'currentPageChange'

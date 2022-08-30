@@ -51,13 +51,17 @@ export default {
     },
 
     watch: {
-        // Update table whenever the server params change
         serverParams: {
+            // Update table whenever the server params change
             handler() {
                 localStorage.setItem(PER_PAGE_STORAGE_KEY, this.serverParams.perPage);
                 this.updateTable();
             },
             deep: true
+        },
+        items() {
+            // Scroll to top when the list of items change
+            window.scrollTo(0, 0);
         }
     },
 
