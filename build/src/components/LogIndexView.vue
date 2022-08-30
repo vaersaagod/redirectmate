@@ -276,7 +276,7 @@ export default {
                           <td>
                               <input type="checkbox" v-model="selectedItems" :value="logItem.id" class="relative top-2px">
                           </td>
-                          <td class="break-all">
+                          <td class="break-all" width="40%">
                               <span class="status-dot inline-block w-10px h-10px rounded-100 mr-10" :class="{ 'bg-green-600': logItem.handled || newlyHandledItems.includes(logItem.id), 'bg-red-600': !logItem.handled && !newlyHandledItems.includes(logItem.id), 'is-checking': checkingItems.includes(logItem.id) }" :title="logItem.handled ? Craft.t('redirectmate', 'Handled') : Craft.t('redirectmate', 'Not handled')"></span>
                               <a :href="getItemSourceUrl(logItem)" class="go" target="_blank">{{ logItem.sourceUrl }}</a>
                           </td>

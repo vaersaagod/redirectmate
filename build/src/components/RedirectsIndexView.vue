@@ -225,11 +225,11 @@ export default {
                             <td>
                                 <input type="checkbox" v-model="selectedItems" :value="item.id" class="relative top-2px">
                             </td>
-                            <td class="break-all">
+                            <td class="break-all" width="40%">
                                 <span v-if="item.isRegexp">{{ item.sourceUrl }}</span>
                                 <a v-else :href="getItemUrl(item, item.sourceUrl)" class="go" target="_blank">{{ item.sourceUrl }}</a>
                             </td>
-                            <td>
+                            <td class="whitespace-nowrap">
                                 {{ item.statusCode }}
                             </td>
                             <td class="break-all">
