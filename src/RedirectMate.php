@@ -73,14 +73,8 @@ class RedirectMate extends Plugin
         // Register a custom log target, keeping the format as simple as possible.
         Craft::getLogger()->dispatcher->targets[] = new MonologTarget([
             'name' => 'redirectmate',
-            'categories' => ['redirectmate', 'vaersaagod\redirectmate\*'],
-            'level' => LogLevel::INFO,
-            'logContext' => false,
-            'allowLineBreaks' => false,
-            'formatter' => new LineFormatter(
-                format: "%datetime% [%level_name%] %message%\n",
-                dateFormat: 'Y-m-d H:i:s',
-            ),
+            'categories' => ['redirectmate', 'vaersaagod\\redirectmate\\*'],
+            'allowLineBreaks' => true,
         ]);
 
         // Add utility
@@ -92,7 +86,7 @@ class RedirectMate extends Plugin
 
         // Handle front-end 404 exceptions
         $request = Craft::$app->getRequest();
-        if ($request->getIsSiteRequest() && $request->method === 'GET' && !$request->getIsActionRequest() && !$request->getIsPreview() && !$request->getIsLivePreview()) {
+        if ($request->method === 'GET' && $request->getIsSiteRequest() && !$request->getIsActionRequest() && !$request->getIsPreview() && !$request->getIsLivePreview()) {
             Event::on(ErrorHandler::class, ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION,
                 static function (ExceptionEvent $e) {
                     $exception = $e->exception;
@@ -113,7 +107,7 @@ class RedirectMate extends Plugin
         }
 
         // Automatically create element redirects
-        if (static::getInstance()->getSettings()->autoCreateElementRedirects) {
+        if (static::getInstance()?->getSettings()->autoCreateElementRedirects) {
             static::getInstance()->elementUriWatcher->watchElementUris();
         }
 
