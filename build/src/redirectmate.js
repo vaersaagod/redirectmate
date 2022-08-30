@@ -35,9 +35,9 @@ const app = createApp({
         }
     },
     watch: {
-        // activeTab(newTab, oldTab) {
-        //     
-        // }
+        activeTab(newTab, oldTab) {
+            console.log({ newTab, oldTab });
+        }
     },
     methods: {
         initTabs() {

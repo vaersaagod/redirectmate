@@ -254,8 +254,8 @@ export default {
             <p class="mx-auto py-70 text-center">{{ Craft.t('redirectmate', 'No errors have been logged.') }}</p>
         </div>
 
-        <div class="w-100" v-if="items && items.length > 0">
-            <div class="tableview tablepane mt-20">
+        <div class="w-100">
+            <div class="tableview tablepane mt-20" v-if="items && items.length > 0">
               <table class="data fullwidth w-100">
                   <thead>
                       <tr>
@@ -308,11 +308,12 @@ export default {
             </div>
 
             <IndexViewFooter
-                    :current-page="serverParams.page"
-                    :per-page="serverParams.perPage"
-                    :total-count="totalCount"
-                    :export-action="actions.exportLogs"
-                    @per-page-changed="value => this.serverParams.perPage = value"
+                :current-page="serverParams.page"
+                :per-page="serverParams.perPage"
+                :total-count="totalCount"
+                :export-action="actions.exportLogs"
+                @per-page-change="perPage => this.serverParams.perPage = parseInt(perPage, 10)"
+                @current-page-change="currentPage => this.serverParams.page = parseInt(currentPage, 10)"
             />
 
         </div>

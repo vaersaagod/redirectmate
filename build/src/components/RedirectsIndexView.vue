@@ -51,6 +51,7 @@ export default {
     },
 
     watch: {
+        // Update table whenever the server params change
         serverParams: {
             handler() {
                 localStorage.setItem(PER_PAGE_STORAGE_KEY, this.serverParams.perPage);
@@ -195,8 +196,8 @@ export default {
             <p class="mx-auto py-70 text-center">{{ Craft.t('redirectmate', 'No redirects.') }}</p>
         </div>
 
-        <div class="w-100" v-if="items && items.length > 0">
-            <div class="tableview tablepane mt-20">
+        <div class="w-100">
+            <div class="tableview tablepane mt-20" v-if="items && items.length > 0">
                 <table class="data w-100">
                     <thead>
                         <tr>
@@ -267,7 +268,8 @@ export default {
                 :per-page="serverParams.perPage"
                 :total-count="totalCount"
                 :export-action="actions.exportRedirects"
-                @per-page-changed="value => this.serverParams.perPage = value"
+                @per-page-change="perPage => this.serverParams.perPage = parseInt(perPage, 10)"
+                @current-page-change="currentPage => this.serverParams.page = parseInt(currentPage, 10)"
             />
 
         </div>
