@@ -2,8 +2,8 @@ import { createApp } from '../node_modules/vue/dist/vue.esm-bundler.js';
 import axios from "axios";
 import { stringify } from 'qs';
 
-import LogView from './components/LogView.vue';
-import RedirectsView from './components/RedirectsView.vue';
+import LogIndexView from './components/LogIndexView.vue';
+import RedirectsIndexView from './components/RedirectsIndexView.vue';
 import CreateRedirectModal from './components/CreateRedirectModal.vue';
 
 import './redirectmate.scss';
@@ -63,8 +63,8 @@ const app = createApp({
     }
 });
 
-app.component('LogView', LogView);
-app.component('RedirectsView', RedirectsView);
+app.component('LogIndexView', LogIndexView);
+app.component('RedirectsIndexView', RedirectsIndexView);
 app.component('CreateRedirectModal', CreateRedirectModal);
 
 app.provide('$axios', axiosInstance);

@@ -1,5 +1,10 @@
 <script>
+import IndexViewFooter from './includes/IndexViewFooter.vue';
+
+const PER_PAGE_STORAGE_KEY = 'redirectmate:redirects:perPage';
+
 export default {
+    components: {IndexViewFooter},
     inject: ['$axios', 'Craft'],
     props: {},
     data() {
@@ -13,17 +18,17 @@ export default {
             totalCount: null,
 
             sites: [],
-            
+
             serverParams: {
                 page: 1,
-                perPage: 50,
+                perPage: parseInt(localStorage.getItem(PER_PAGE_STORAGE_KEY) || 50, 10),
                 handled: 'all',
                 site: 'all',
                 sortBy: 'newest'
             },
 
             actions: {}
-        }
+        };
     },
 
     computed: {
@@ -45,7 +50,15 @@ export default {
         }
     },
 
-    watch: {},
+    watch: {
+        serverParams: {
+            handler() {
+                localStorage.setItem(PER_PAGE_STORAGE_KEY, this.serverParams.perPage);
+                this.updateTable();
+            },
+            deep: true
+        }
+    },
 
     methods: {
         loadItems() {
@@ -74,7 +87,7 @@ export default {
         },
         batchDeleteItems() {
             console.log('batchDeleteItems', this.selectedItems);
-            
+
             this.$axios.post(this.actions.deleteRedirects, { ids: this.selectedItems })
                 .then(({ data }) => {
                     console.log(data);
@@ -84,7 +97,7 @@ export default {
                 .catch(error => {
                     console.error(error);
                 });
-            
+
         },
         editRedirect(id) {
             this.modalMode = 'edit';
@@ -103,14 +116,14 @@ export default {
             if (targetUrl.startsWith('http')) {
                 return targetUrl;
             }
-            
+
             // FIXME: Get primary site instead
             let site = this.sites[0];
-            
+
             if (item.siteId !== null) {
                 site = this.sites.find( ({ id }) => id === parseInt(item.siteId, 10));
             }
-            
+
             return this.Craft.getUrl(targetUrl.substring(1), null, site.baseUrl);
         },
         formatDateTime(dateTime) {
@@ -127,13 +140,13 @@ export default {
         console.log('mounted');
 
         const { sites, actions } = window.redirectMate;
-        
+
         if (sites && sites.length) {
             this.sites = sites;
         }
 
         this.actions = actions;
-        
+
         this.loadItems();
         Craft.initUiElements();
     }
@@ -249,27 +262,14 @@ export default {
                 </table>
             </div>
 
-            <div class="mt-40 flex justify-between">
-                <p class="text-gray-500 mb-0">{{ Craft.t('redirectmate', '{from}-{to} of {total} redirects', {
-                  from: ((serverParams.page - 1) * serverParams.perPage) + 1,
-                  to: Math.min(serverParams.page * serverParams.perPage, totalCount),
-                  total: totalCount
-                }) }}</p>
-                <div class="flex">
-                    <div class="flex">
-                        <span class="text-gray-500">{{ Craft.t('redirectmate', 'Display') }}:</span>
-                        <div class="select">
-                            <select name="limit" v-model="serverParams.perPage" @change="updateTable">
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                        </div>
-                    </div>
-                    <a :href="totalCount ? actions.exportRedirects : false" class="btn" :class="{ disabled: !totalCount }">{{ Craft.t('redirectmate', 'Export') }}</a>
-                </div>
-            </div>
+            <IndexViewFooter
+                :current-page="serverParams.page"
+                :per-page="serverParams.perPage"
+                :total-count="totalCount"
+                :export-action="actions.exportRedirects"
+                @per-page-changed="value => this.serverParams.perPage = value"
+            />
+
         </div>
 
         <create-redirect-modal

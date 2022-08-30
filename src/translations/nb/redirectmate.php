@@ -1,8 +1,7 @@
 <?php
 
 return [
-    '{from}-{to} of {total} errors' => '{from}-{to} av {total} feil',
-    '{from}-{to} of {total} redirects' => '{from}-{to} av {total} videresendinger',
+    '{from}-{to} of {total}' => '{from}-{to} av {total}',
     'All errors' => 'Alle feil',
     'All sites' => 'Alle nettsider',
     'An error occurred.' => 'En feil oppstod.',

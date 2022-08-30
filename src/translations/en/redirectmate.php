@@ -1,8 +1,7 @@
 <?php
 
 return [
-    '{from}-{to} of {total} errors' => '{from}-{to} of {total} errors',
-    '{from}-{to} of {total} redirects' => '{from}-{to} of {total} redirects',
+    '{from}-{to} of {total}' => '{from}-{to} of {total}',
     'All errors' => 'All errors',
     'All sites' => 'All sites',
     'An error occurred.' => 'An error occurred.',

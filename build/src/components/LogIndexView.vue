@@ -2,7 +2,12 @@
 import isbot from 'isbot';
 import UAParser from 'ua-parser-js';
 
+import IndexViewFooter from './includes/IndexViewFooter.vue';
+
+const PER_PAGE_STORAGE_KEY = 'redirectmate:logs:perPage';
+
 export default {
+    components: {IndexViewFooter},
     inject: ['$axios', 'Craft'],
     props: {},
     data() {
@@ -22,7 +27,7 @@ export default {
 
             serverParams: {
                 page: 1,
-                perPage: 50,
+                perPage: parseInt(localStorage.getItem(PER_PAGE_STORAGE_KEY) || 50, 10),
                 handled: 'all',
                 site: 'all',
                 sortBy: 'hits'
@@ -53,7 +58,15 @@ export default {
         }
     },
 
-    watch: {},
+    watch: {
+        serverParams: {
+            handler() {
+                localStorage.setItem(PER_PAGE_STORAGE_KEY, this.serverParams.perPage);
+                this.updateTable();
+            },
+            deep: true
+        }
+    },
 
     methods: {
         loadItems() {
@@ -294,27 +307,14 @@ export default {
               </table>
             </div>
 
-            <div class="mt-40 flex justify-between">
-              <p class="text-gray-500 mb-0">{{ Craft.t('redirectmate', '{from}-{to} of {total} errors', {
-                  from: ((serverParams.page - 1) * serverParams.perPage) + 1,
-                  to: Math.min(serverParams.page * serverParams.perPage, totalCount),
-                  total: totalCount
-              }) }}</p>
-                <div class="flex">
-                    <div class="flex">
-                        <span class="text-gray-500">{{ Craft.t('redirectmate', 'Display') }}:</span>
-                        <div class="select">
-                            <select name="limit" v-model="serverParams.perPage" @change="updateTable">
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                        </div>
-                    </div>
-                    <a :href="totalCount ? actions.exportLogs : false" class="btn" :class="{ disabled: !totalCount }">{{ Craft.t('redirectmate', 'Export') }}</a>
-                </div>
-            </div>
+            <IndexViewFooter
+                    :current-page="serverParams.page"
+                    :per-page="serverParams.perPage"
+                    :total-count="totalCount"
+                    :export-action="actions.exportLogs"
+                    @per-page-changed="value => this.serverParams.perPage = value"
+            />
+
         </div>
 
         <create-redirect-modal

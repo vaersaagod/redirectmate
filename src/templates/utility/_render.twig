@@ -20,8 +20,8 @@
             }), {})
         }) }}
     </header>
-    <log-view v-if="activeTab === 'tab--log'"></log-view>
-    <redirects-view v-if="activeTab === 'tab--redirects'"></redirects-view>
+    <log-index-view v-if="activeTab === 'tab--log'"></log-index-view>
+    <redirects-index-view v-if="activeTab === 'tab--redirects'"></redirects-index-view>
 </div>
 
 {% set sites = craft.app.getSites().getAllSites() %}
