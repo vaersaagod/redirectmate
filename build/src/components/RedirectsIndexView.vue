@@ -24,7 +24,8 @@ export default {
                 perPage: parseInt(localStorage.getItem(PER_PAGE_STORAGE_KEY) || 50, 10),
                 handled: 'all',
                 site: 'all',
-                sortBy: 'newest'
+                sortBy: 'newest',
+                search: null
             },
 
             actions: {}
@@ -47,6 +48,15 @@ export default {
 
                 this.selectedItems = selected;
             }
+        },
+        searchQuery: {
+            get() {
+                return this.serverParams.search;
+            },
+            set(value) {
+                // TODO: min 2 chars; debounce?
+                this.serverParams.search = value;
+            }
         }
     },
 
@@ -61,6 +71,10 @@ export default {
         },
         items() {
             // Scroll to top when the list of items change
+            window.scrollTo(0, 0);
+        },
+        totalCount() {
+            this.serverParams.page = 1;
             window.scrollTo(0, 0);
         }
     },
@@ -161,7 +175,7 @@ export default {
 <template>
     <div class="flex flex-col">
         <div class="flex w-100 justify-between">
-            <div class="flex">
+            <div id="toolbar" class="flex">
 
                 <div class="select" v-if="sites && sites.length > 1">
                     <select v-model="serverParams.site" @change="updateTable">
@@ -179,6 +193,12 @@ export default {
                 </div>
 
                 <div data-icon="settings" class="btn menubtn" :class="{ hidden: selectedItems.length === 0 }"></div>
+
+                <!-- Search -->
+                <div class="flex-grow texticon search icon">
+                    <input type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search" dir="ltr" aria-label="Search" v-model="searchQuery">
+                    <button class="clear-btn" :class="{ hidden: !serverParams.search }" title="Clear search" role="button" aria-label="Clear search" @click="serverParams.search = ''"></button>
+                </div>
 
                 <div data-align="left" class="menu">
                     <ul role="listbox">

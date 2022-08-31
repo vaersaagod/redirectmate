@@ -28,11 +28,6 @@
         top: -1px;
     }
 
-    .icon.search:before {
-        top: -2px;
-        position: relative;
-    }
-
     .icon.add:before {
         top: 1px;
     }
@@ -50,6 +45,11 @@
 
     .modal-box-shadow {
         box-shadow: 0 25px 100px rgb(31 41 51 / 50%);
+    }
+
+    .create-redirect-modal .icon.search:before {
+        top: -2px;
+        position: relative;
     }
 }
 

@@ -33,11 +33,12 @@ class CpController extends Controller
     {
         $this->requireAcceptsJson();
         
-        $limit = Craft::$app->getRequest()->getParam('perPage', 20);
-        $page = Craft::$app->getRequest()->getParam('page', 1);
-        $handled = Craft::$app->getRequest()->getParam('handled', 'all');
-        $site = Craft::$app->getRequest()->getParam('site', 'all');
-        $sortBy = Craft::$app->getRequest()->getParam('sortBy', 'hits');
+        $limit = $this->request->getParam('perPage', 20);
+        $page = $this->request->getParam('page', 1);
+        $handled = $this->request->getParam('handled', 'all');
+        $site = $this->request->getParam('site', 'all');
+        $sortBy = $this->request->getParam('sortBy', 'hits');
+        $search = $this->request->getParam('search');
 
         $query = TrackerModel::find();
         
@@ -47,6 +48,10 @@ class CpController extends Controller
         
         if ($site !== 'all') {
             $query->andWhere('siteId = :site', ['site' => $site]);
+        }
+
+        if ($search) {
+            $query->filterWhere(['like', 'sourceUrl', $search]);
         }
         
         $totalCount = $query->count();
@@ -143,17 +148,25 @@ class CpController extends Controller
     {
         $this->requireAcceptsJson();
         
-        $limit = Craft::$app->getRequest()->getParam('perPage', 20);
-        $page = Craft::$app->getRequest()->getParam('page', 1);
-        $site = Craft::$app->getRequest()->getParam('site', 'all');
-        $sortBy = Craft::$app->getRequest()->getParam('sortBy', 'newest');
+        $limit = $this->request->getParam('perPage', 20);
+        $page = $this->request->getParam('page', 1);
+        $site = $this->request->getParam('site', 'all');
+        $sortBy = $this->request->getParam('sortBy', 'newest');
+
+        $search = $this->request->getParam('search');
 
         $query = RedirectModel::find();
+
+        if ($search) {
+            $query
+                ->filterWhere(['like', 'sourceUrl', $search])
+                ->orFilterWhere(['like', 'destinationUrl', $search]);
+        }
 
         if ($site !== 'all') {
             $query->andWhere('siteId = :site', ['site' => $site]);
         }
-        
+
         $totalCount = $query->count();
         
         switch ($sortBy) {
