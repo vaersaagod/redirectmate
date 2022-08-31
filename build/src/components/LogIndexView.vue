@@ -316,8 +316,8 @@ export default {
                               </div>
                           </td>
                           <td v-if="trackingEnabled('ip')">
-                              <span v-if="logItem.remoteIp === '127.0.0.1'" class="inline-block">{{ logItem.remoteIp }}</span>
-                              <a v-if="logItem.remoteIp !== '127.0.0.1'" class="inline-block go" :href="'https://whatismyipaddress.com/ip/' + logItem.remoteIp" target="_blank">{{ logItem.remoteIp }}</a>
+                              <span v-if="logItem.remoteIp === null || logItem.remoteIp === '127.0.0.1'" class="inline-block">{{ logItem.remoteIp }}</span>
+                              <a v-else class="inline-block go" :href="'https://whatismyipaddress.com/ip/' + logItem.remoteIp" target="_blank">{{ logItem.remoteIp }}</a>
                           </td>
                           <td :title="logItem.userAgent"  v-if="trackingEnabled('useragent')">
                               <span class="capitalize" v-if="isUaBot(logItem.userAgent)">{{ getBot(logItem.userAgent) }}</span>
