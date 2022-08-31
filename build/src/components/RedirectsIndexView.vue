@@ -54,7 +54,8 @@ export default {
                 return this.serverParams.search;
             },
             set(value) {
-                // TODO: min 2 chars; debounce?
+                // Make sure the page is reset to 1 when the search query changes
+                this.serverParams.page = 1;
                 this.serverParams.search = value;
             }
         }
@@ -70,11 +71,8 @@ export default {
             deep: true
         },
         items() {
-            // Scroll to top when the list of items change
-            window.scrollTo(0, 0);
-        },
-        totalCount() {
-            this.serverParams.page = 1;
+            // Scroll to top when the list of items change, and deselect any selected items
+            this.selectedItems = [];
             window.scrollTo(0, 0);
         }
     },
