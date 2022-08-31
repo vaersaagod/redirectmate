@@ -55,6 +55,7 @@ export default {
             },
             set(value) {
                 // Make sure the page is reset to 1 when the search query changes
+                this.totalCount = 0;
                 this.serverParams.page = 1;
                 this.serverParams.search = value;
             }
@@ -71,9 +72,8 @@ export default {
             deep: true
         },
         items() {
-            // Scroll to top when the list of items change, and deselect any selected items
+            // Deselect any selected items when the list of items is changed
             this.selectedItems = [];
-            window.scrollTo(0, 0);
         }
     },
 
@@ -190,7 +190,15 @@ export default {
                     </select>
                 </div>
 
-                <div data-icon="settings" class="btn menubtn" :class="{ hidden: selectedItems.length === 0 }"></div>
+                <!-- Actions menu -->
+                <div :class="{ hidden: selectedItems.length === 0 }">
+                    <div data-icon="settings" class="btn menubtn"></div>
+                    <div data-align="left" class="menu">
+                        <ul role="listbox">
+                            <li class="cursor-pointer" @click="batchDeleteItems"><a>{{ Craft.t('redirectmate', 'Delete') }}</a></li>
+                        </ul>
+                    </div>
+                </div>
 
                 <!-- Search -->
                 <div class="flex-grow texticon search icon">
@@ -198,11 +206,6 @@ export default {
                     <button class="clear-btn" :class="{ hidden: !serverParams.search }" title="Clear search" role="button" aria-label="Clear search" @click="serverParams.search = ''"></button>
                 </div>
 
-                <div data-align="left" class="menu">
-                    <ul role="listbox">
-                        <li @click="batchDeleteItems"><a>{{ Craft.t('redirectmate', 'Delete') }}</a></li>
-                    </ul>
-                </div>
             </div>
 
             <div class="flex">

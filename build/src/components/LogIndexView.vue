@@ -246,7 +246,16 @@ export default {
                     </select>
                 </div>
 
-                <div data-icon="settings" class="btn menubtn" :class="{ hidden: selectedItems.length === 0 }"></div>
+                <!-- Actions menu -->
+                <div :class="{ hidden: selectedItems.length === 0 }">
+                    <div data-icon="settings" class="btn menubtn"></div>
+                    <div data-align="left" class="menu">
+                        <ul role="listbox">
+                            <li @click="batchDeleteItems"><a>{{ Craft.t('redirectmate', 'Delete') }}</a></li>
+                            <li><a @click="batchCheckItems">{{ Craft.t('redirectmate', 'Check') }}</a></li>
+                        </ul>
+                    </div>
+                </div>
 
                 <!-- Search -->
                 <div class="flex-grow texticon search icon">
@@ -254,12 +263,6 @@ export default {
                     <button class="clear-btn" :class="{ hidden: !serverParams.search }" title="Clear search" role="button" aria-label="Clear search" @click="serverParams.search = ''"></button>
                 </div>
 
-                <div data-align="left" class="menu">
-                    <ul role="listbox">
-                        <li @click="batchDeleteItems"><a>{{ Craft.t('redirectmate', 'Delete') }}</a></li>
-                        <li><a @click="batchCheckItems">{{ Craft.t('redirectmate', 'Check') }}</a></li>
-                    </ul>
-                </div>
             </div>
 
             <div class="flex">
