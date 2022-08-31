@@ -11,7 +11,6 @@ use craft\helpers\ElementHelper;
 use craft\models\Site;
 use craft\services\Elements;
 
-use vaersaagod\redirectmate\helpers\RedirectHelper;
 use vaersaagod\redirectmate\helpers\UrlHelper;
 use vaersaagod\redirectmate\models\RedirectModel;
 use vaersaagod\redirectmate\RedirectMate;
@@ -50,12 +49,12 @@ class ElementUriWatcher extends Component
 
         static::$_watchedElementUris = [];
 
-        if (!RedirectMate::getInstance()->getSettings()->autoCreateElementRedirects) {
+        if (!RedirectMate::getInstance()?->getSettings()->autoCreateElementRedirects) {
             return;
         }
 
         // Cache the "Match by" setting for element auto-redirects
-        if (RedirectMate::getInstance()->getSettings()->autoCreateElementRedirectsMatchBy === RedirectModel::MATCHBY_FULLURL) {
+        if (RedirectMate::getInstance()?->getSettings()->autoCreateElementRedirectsMatchBy === RedirectModel::MATCHBY_FULLURL) {
             static::$_matchElementUrisBy = RedirectModel::MATCHBY_FULLURL;
         } else {
             static::$_matchElementUrisBy = RedirectModel::MATCHBY_PATH;

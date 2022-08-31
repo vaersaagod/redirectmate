@@ -17,9 +17,6 @@ use craft\log\MonologTarget;
 use craft\services\Utilities;
 use craft\web\ErrorHandler;
 
-use Monolog\Formatter\LineFormatter;
-use Psr\Log\LogLevel;
-
 use yii\base\Event;
 use yii\web\HttpException;
 
@@ -106,10 +103,8 @@ class RedirectMate extends Plugin
                 });
         }
 
-        // Automatically create element redirects
-        if (static::getInstance()?->getSettings()->autoCreateElementRedirects) {
-            static::getInstance()->elementUriWatcher->watchElementUris();
-        }
+        // (Maybe) automatically create element redirects
+        static::getInstance()->elementUriWatcher->watchElementUris();
 
     }
 
