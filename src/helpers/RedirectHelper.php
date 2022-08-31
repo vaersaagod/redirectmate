@@ -149,10 +149,12 @@ class RedirectHelper
     public static function insertOrUpdateRedirect(RedirectModel $redirectModel): RedirectModel
     {
 
-        $attributes = $redirectModel->getAttributes(null, ['uid', 'dateUpdated']);
+        $attributes = $redirectModel->getAttributes(null, ['uid', 'dateCreated', 'dateUpdated']);
+
         if (isset($redirectModel->lastHit)) {
             $attributes['lastHit'] = Db::prepareDateForDb($redirectModel->lastHit);
         }
+
         if (isset($redirectModel->dateCreated)) {
             $attributes['dateCreated'] = Db::prepareDateForDb($redirectModel->dateCreated);
         }
