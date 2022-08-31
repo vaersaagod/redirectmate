@@ -86,7 +86,7 @@ class RedirectMate extends Plugin
 
         // Handle front-end 404 exceptions
         $request = Craft::$app->getRequest();
-        if ($request->method === 'GET' && $request->getIsSiteRequest() && !$request->getIsActionRequest() && !$request->getIsPreview() && !$request->getIsLivePreview()) {
+        if ($request->getIsSiteRequest() && $request->method === 'GET' && !$request->getIsActionRequest() && !$request->getIsPreview() && !$request->getIsLivePreview()) {
             Event::on(ErrorHandler::class, ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION,
                 static function (ExceptionEvent $e) {
                     $exception = $e->exception;
