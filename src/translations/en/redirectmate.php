@@ -9,6 +9,7 @@ return [
     'An error occurred when trying to create URL.' => 'An error occurred when trying to create URL.',
     'Are you sure you want to clear the log?' => 'Are you sure you want to clear the log?',
     'By hits' => 'By hits',
+    'Cached redirects' => 'Cached redirects',
     'Cancel' => 'Cancel',
     'Check' => 'Check',
     'Clear log' => 'Clear log',

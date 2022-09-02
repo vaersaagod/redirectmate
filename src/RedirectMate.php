@@ -12,11 +12,14 @@ use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
 use craft\events\ExceptionEvent;
+use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\log\MonologTarget;
 use craft\services\Utilities;
+use craft\utilities\ClearCaches;
 use craft\web\ErrorHandler;
 
+use vaersaagod\redirectmate\helpers\CacheHelper;
 use yii\base\Event;
 use yii\web\HttpException;
 
@@ -105,6 +108,18 @@ class RedirectMate extends Plugin
 
         // (Maybe) automatically create element redirects
         static::getInstance()->elementUriWatcher->watchElementUris();
+
+        // Add a clear cache option for resolved redirects
+        Event::on(
+            ClearCaches::class,
+            ClearCaches::EVENT_REGISTER_TAG_OPTIONS,
+            static function (RegisterCacheOptionsEvent $event) {
+                $event->options[] = [
+                    'tag' => CacheHelper::TAG_REDIRECTMATE,
+                    'label' => Craft::t('redirectmate', 'Cached redirects'),
+                ];
+            }
+        );
 
     }
 

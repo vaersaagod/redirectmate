@@ -9,6 +9,7 @@ return [
     'An error occurred when trying to create URL.' => 'En feil oppstod under generering av URL.',
     'Are you sure you want to clear the log?' => 'Er du sikker på at du vil tømme loggen?',
     'By hits' => 'Flest treff',
+    'Cached redirects' => 'Mellomlagrede videresendinger',
     'Cancel' => 'Avbryt',
     'Check' => 'Sjekk',
     'Clear log' => 'Tøm logg',
