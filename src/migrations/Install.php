@@ -101,6 +101,7 @@ class Install extends Migration
 
                     // Custom columns in the table
                     'siteId' => $this->integer()->null()->defaultValue(null),
+                    'enabled' => $this->boolean()->defaultValue(true),
                     'sourceUrl' => $this->string(1000)->notNull()->defaultValue(''),
                     'referrer' => $this->string(1000)->defaultValue(''),
                     'remoteIp' => $this->string(45)->defaultValue(''),
@@ -152,6 +153,13 @@ class Install extends Migration
             $this->db->getIndexName(),
             '{{%redirectmate_tracker}}',
             'siteId',
+            false
+        );
+
+        $this->createIndex(
+            $this->db->getIndexName(),
+            '{{%redirectmate_tracker}}',
+            'enabled',
             false
         );
 
