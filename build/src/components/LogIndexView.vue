@@ -197,6 +197,14 @@ export default {
         },
         trackingEnabled(prop) {
             return this.settings.track ? this.settings.track.includes(prop) : false;
+        },
+        getSiteName(siteId) {
+            if (siteId) {
+                const site = this.sites.find( ({ id }) => id === siteId );
+                return site ? site.name : Craft.t('redirectmate', 'Unknown');
+            } else {
+                return Craft.t('redirectmate', 'All sites');
+            }
         }
     },
 
@@ -290,6 +298,7 @@ export default {
                           <th>
                               <div class="text-center">{{ Craft.t('redirectmate', 'Hits') }}</div>
                           </th>
+                          <th v-if="sites && sites.length > 1">{{ Craft.t('redirectmate', 'Site') }}</th>
                           <th v-if="trackingEnabled('ip')">{{ Craft.t('redirectmate', 'Remote IP') }}</th>
                           <th v-if="trackingEnabled('useragent')">{{ Craft.t('redirectmate', 'User Agent') }}</th>
                           <th v-if="trackingEnabled('referrer')">{{ Craft.t('redirectmate', 'Referrer') }}</th>
@@ -314,6 +323,9 @@ export default {
                               <div class="text-center">
                                   {{ logItem.hits }}
                               </div>
+                          </td>
+                          <td class="whitespace-nowrap" v-if="sites && sites.length > 1">
+                              {{ getSiteName(logItem.siteId) }}
                           </td>
                           <td v-if="trackingEnabled('ip')">
                               <span v-if="logItem.remoteIp === null || logItem.remoteIp === '127.0.0.1'" class="inline-block">{{ logItem.remoteIp }}</span>

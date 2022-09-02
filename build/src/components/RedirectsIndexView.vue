@@ -230,7 +230,7 @@ export default {
                             <th>{{ Craft.t('redirectmate', 'Source URL') }}</th>
                             <th>{{ Craft.t('redirectmate', 'Status') }}</th>
                             <th>{{ Craft.t('redirectmate', 'Destination URL') }}</th>
-                            <th>{{ Craft.t('redirectmate', 'Site') }}</th>
+                            <th v-if="sites && sites.length > 1">{{ Craft.t('redirectmate', 'Site') }}</th>
                             <th>
                                 <div class="text-right">{{ Craft.t('redirectmate', 'Hits') }}</div>
                             </th>
@@ -261,7 +261,7 @@ export default {
                                 <span v-if="item.isRegexp">{{ item.destinationUrl }}</span>
                                 <a v-else :href="getItemUrl(item, item.destinationUrl)" class="go" target="_blank" :data-icon="!item.destinationUrl || item.destinationUrl === '/' ? 'home' : false">{{ item.destinationUrl != '/' ? item.destinationUrl : '' }}</a>
                             </td>
-                            <td class="whitespace-nowrap">
+                            <td class="whitespace-nowrap" v-if="sites && sites.length > 1">
                                 {{ getSiteName(item.siteId) }}
                             </td>
                             <td class="text-right">
