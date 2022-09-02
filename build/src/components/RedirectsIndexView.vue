@@ -72,7 +72,6 @@ export default {
             deep: true
         },
         items() {
-            // Deselect any selected items when the list of items is changed
             this.selectedItems = [];
         }
     },

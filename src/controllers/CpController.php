@@ -41,9 +41,14 @@ class CpController extends Controller
         $search = $this->request->getParam('search');
 
         $query = TrackerModel::find();
-        
-        if ($handled !== 'all') {
-            $query->andWhere('handled = ' . ($handled === 'handled' ? '1' : '0'));
+
+        if ($handled === 'muted') {
+            $query->andWhere('enabled = :enabled', ['enabled' => false]);
+        } else {
+            $query->andWhere('enabled = :enabled', ['enabled' => true]);
+            if ($handled !== 'all') {
+                $query->andWhere('handled = ' . ($handled === 'handled' ? '1' : '0'));
+            }
         }
         
         if ($site !== 'all') {
@@ -102,6 +107,29 @@ class CpController extends Controller
         $statusCode = UrlHelper::getUrlStatusCode($url);
 
         return $this->asSuccess(Craft::t('redirectmate', 'URL checked'), ['id' => $id, 'code' => $statusCode, 'handled' => $statusCode !== 404 ]);
+    }
+
+    /**
+     * @return Response
+     * @throws \yii\web\BadRequestHttpException
+     */
+    public function actionToggleMuteLogItem(): Response
+    {
+        $id = Craft::$app->getRequest()->getRequiredParam('id');
+
+        $query = TrackerModel::find()
+            ->where('id=:id', ['id' => $id]);
+
+        if (!$trackerModel = $query->one()) {
+            return $this->asFailure(Craft::t('redirectmate', 'Could not find log item.'), ['id' => $id]);
+        }
+
+        $trackerModel->enabled = !$trackerModel->enabled;
+
+        TrackerHelper::insertOrUpdateTracker($trackerModel);
+
+        return $this->asSuccess();
+
     }
 
     /**

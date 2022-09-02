@@ -23,6 +23,11 @@ class TrackerModel extends Model
     public ?int $siteId = null;
 
     /**
+     * @var bool
+     */
+    public bool $enabled = true;
+
+    /**
      * @var string|null
      */
     public ?string $sourceUrl = null;

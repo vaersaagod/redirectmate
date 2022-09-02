@@ -78,9 +78,7 @@ export default {
             deep: true
         },
         items() {
-            // Scroll to top when the list of items change, and deselect any selected items
             this.selectedItems = [];
-            window.scrollTo(0, 0);
         }
     },
 
@@ -173,6 +171,16 @@ export default {
             this.modalEditId = id;
             this.activeModal = true;
         },
+        toggleMute(id) {
+            this.$axios.post(this.actions.toggleMuteLogItem, { id })
+              .then(({ data }) => {
+                  console.log(data);
+                  this.loadItems();
+              })
+              .catch(error => {
+                  console.error(error);
+              });
+        },
         isUaBot(ua) {
             return isbot(ua);
         },
@@ -243,6 +251,8 @@ export default {
                             <option value="all">{{ Craft.t('redirectmate', 'All errors') }}</option>
                             <option value="handled">{{ Craft.t('redirectmate', 'Handled') }}</option>
                             <option value="nothandled">{{ Craft.t('redirectmate', 'Not Handled') }}</option>
+                            <option disabled>----</option>
+                            <option value="muted">{{ Craft.t('redirectmate', 'Muted') }}</option>
                         </select>
                     </div>
                     <div class="select">
@@ -301,6 +311,7 @@ export default {
                           <th v-if="trackingEnabled('ip')">{{ Craft.t('redirectmate', 'Remote IP') }}</th>
                           <th v-if="trackingEnabled('useragent')">{{ Craft.t('redirectmate', 'User Agent') }}</th>
                           <th v-if="trackingEnabled('referrer')">{{ Craft.t('redirectmate', 'Referrer') }}</th>
+                          <th>&nbsp;</th>
                       </tr>
                   </thead>
 
@@ -315,7 +326,7 @@ export default {
                           </td>
                           <td>
                               <div class="text-right">
-                                  <button v-if="!logItem.handled" @click="addRedirectForId(logItem.id)" class="btn small">{{ Craft.t('redirectmate', 'Fix') }}</button>
+                                  <button type="button" v-if="!logItem.handled" @click="addRedirectForId(logItem.id)" class="btn small">{{ Craft.t('redirectmate', 'Fix') }}</button>
                               </div>
                           </td>
                           <td :title="`${Craft.t('redirectmate', 'Last hit')}: ${formatDateTime(logItem.lastHit)}\n${Craft.t('redirectmate', 'Created')}: ${formatDateTime(logItem.dateCreated)}`">
@@ -337,6 +348,9 @@ export default {
                           </td>
                           <td v-if="trackingEnabled('referrer')">
                               <a :href="logItem.referrer" v-if="logItem.referrer != null" class="inline-flex go gap-0"><span class="inline-block max-w-[180px] truncate" :title="logItem.referrer">{{ logItem.referrer }}</span></a>
+                          </td>
+                          <td>
+                              <button type="button" @click="toggleMute(logItem.id)" class="btn small">{{ Craft.t('redirectmate', logItem.enabled ? 'Mute' : 'Unmute') }}</button>
                           </td>
                       </tr>
                   </tbody>
