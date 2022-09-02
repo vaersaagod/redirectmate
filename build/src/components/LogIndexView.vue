@@ -284,7 +284,7 @@ export default {
 
             <div class="flex flex-wrap">
                 <button type="button" @click="clearLog" class="btn delete icon" :class="{ disabled: !totalCount }" :disabled="!totalCount">{{ Craft.t('redirectmate', 'Clear log') }}</button>
-                <button type="button" @click="resolve" class="btn submit add icon" :class="{ disabled: !totalCount }">{{ Craft.t('redirectmate', 'Resolve') }}</button>
+                <button type="button" @click="resolve" class="btn submit add icon" :class="{ disabled: !totalCount }">{{ Craft.t('redirectmate', 'Fix all') }}</button>
             </div>
         </div>
 
