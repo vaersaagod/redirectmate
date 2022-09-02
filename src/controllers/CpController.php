@@ -56,7 +56,7 @@ class CpController extends Controller
         }
 
         if ($search) {
-            $query->filterWhere(['like', 'sourceUrl', $search]);
+            $query->andFilterWhere(['like', 'sourceUrl', $search]);
         }
         
         $totalCount = $query->count();
@@ -187,7 +187,7 @@ class CpController extends Controller
 
         if ($search) {
             $query
-                ->filterWhere(['like', 'sourceUrl', $search])
+                ->andFilterWhere(['like', 'sourceUrl', $search])
                 ->orFilterWhere(['like', 'destinationUrl', $search]);
         }
 
