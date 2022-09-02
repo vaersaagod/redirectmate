@@ -10,6 +10,10 @@
 
 .redirectmate-utility {
 
+    #toolbar > * {
+        margin-top: 0 !important;
+    }
+
     td, th {
         vertical-align: top;
     }

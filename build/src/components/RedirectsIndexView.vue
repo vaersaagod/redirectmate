@@ -172,44 +172,46 @@ export default {
 
 <template>
     <div class="flex flex-col">
-        <div class="flex w-100 justify-between">
+        <div class="flex w-100 justify-between items-start">
             <div id="toolbar" class="flex">
 
-                <div class="select" v-if="sites && sites.length > 1">
-                    <select v-model="serverParams.site" @change="updateTable">
-                        <option value="all">{{ Craft.t('redirectmate', 'All sites') }}</option>
-                        <option v-for="item in sites" :value="item.id">{{ item.name }}</option>
-                    </select>
-                </div>
+                <div class="flex flex-wrap">
+                    <div class="select" v-if="sites && sites.length > 1">
+                        <select v-model="serverParams.site" @change="updateTable">
+                            <option value="all">{{ Craft.t('redirectmate', 'All sites') }}</option>
+                            <option v-for="item in sites" :value="item.id">{{ item.name }}</option>
+                        </select>
+                    </div>
 
-                <div class="select">
-                    <select v-model="serverParams.sortBy" @change="updateTable">
-                        <option value="newest">{{ Craft.t('redirectmate', 'Newest') }}</option>
-                        <option value="hits">{{ Craft.t('redirectmate', 'By hits') }}</option>
-                        <option value="lasthit">{{ Craft.t('redirectmate', 'Last hit') }}</option>
-                    </select>
-                </div>
+                    <div class="select">
+                        <select v-model="serverParams.sortBy" @change="updateTable">
+                            <option value="newest">{{ Craft.t('redirectmate', 'Newest') }}</option>
+                            <option value="hits">{{ Craft.t('redirectmate', 'By hits') }}</option>
+                            <option value="lasthit">{{ Craft.t('redirectmate', 'Last hit') }}</option>
+                        </select>
+                    </div>
 
-                <!-- Actions menu -->
-                <div :class="{ hidden: selectedItems.length === 0 }">
-                    <div data-icon="settings" class="btn menubtn"></div>
-                    <div data-align="left" class="menu">
-                        <ul role="listbox">
-                            <li class="cursor-pointer" @click="batchDeleteItems"><a>{{ Craft.t('redirectmate', 'Delete') }}</a></li>
-                        </ul>
+                    <!-- Actions menu -->
+                    <div class="flex-none" :class="{ hidden: selectedItems.length === 0 }">
+                        <div data-icon="settings" class="btn menubtn"></div>
+                        <div data-align="left" class="menu">
+                            <ul role="listbox">
+                                <li class="cursor-pointer" @click="batchDeleteItems"><a>{{ Craft.t('redirectmate', 'Delete') }}</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Search -->
-                <div class="flex-grow texticon search icon">
+                <div class="flex-grow texticon search icon min-w-[240px]">
                     <input type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search" dir="ltr" aria-label="Search" v-model="searchQuery">
                     <button class="clear-btn" :class="{ hidden: !serverParams.search }" title="Clear search" role="button" aria-label="Clear search" @click="serverParams.search = ''"></button>
                 </div>
 
             </div>
 
-            <div class="flex">
-                <button @click="addRedirect" class="btn submit add icon">{{ Craft.t('redirectmate', 'New redirect') }}</button>
+            <div class="flex flex-wrap">
+                <button type="button" @click="addRedirect" class="btn submit add icon">{{ Craft.t('redirectmate', 'New redirect') }}</button>
             </div>
         </div>
 
