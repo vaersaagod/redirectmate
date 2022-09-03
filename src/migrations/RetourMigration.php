@@ -64,7 +64,18 @@ class RetourMigration extends Migration
         $allSiteIds = Craft::$app->getSites()->getAllSiteIds(true);
 
         $retourStatsQuery = (new Query())
-            ->select('*')
+            ->select([
+                'redirectSrcUrl',
+                'siteId',
+                'MAX(dateCreated) as dateCreated',
+                'MAX(dateUpdated) as dateUpdated',
+                'MAX(hitCount) as hitCount',
+                'MAX(hitLastTime) as hitLastTime',
+                'MAX(handledByRetour) as handledByRetour',
+                'MAX(remoteIp) as remoteIp',
+                'MAX(referrerUrl) as referrerUrl',
+                'MAX(userAgent) as userAgent'
+            ])
             ->from($tableName)
             ->groupBy(['redirectSrcUrl', 'siteId']);
 
