@@ -14,6 +14,7 @@ export default {
         return {
 
             isLoading: false,
+            hasOpenSelectModal: false,
             isAtEnd: false,
             currentEditId: null,
 
@@ -73,16 +74,23 @@ export default {
             this.$nextTick(this.focusToFirstErrorInput);
         },
         currentData(newValue) {
-          console.log({newValue});
+          //console.log({newValue});
         }
     },
     methods: {
         openElementSelect() {
+            this.hasOpenSelectModal = true;
+            
             const modal = window.Craft.createElementSelectorModal('craft\\elements\\Entry', {
                 defaultSiteId: this.currentData.site != 'all' ? this.currentData.site : null,
                 onSelect: e => {
                     const url = new URL(e[0].url);
                     this.currentData.destinationUrl = url.pathname;
+                },
+                onHide: e => {
+                    setTimeout(() => {
+                        this.hasOpenSelectModal = false;
+                    }, 150);
                 }
             });
         },
@@ -173,7 +181,6 @@ export default {
         },
 
         doSave(saveMode) {
-
             this.isLoading = true;
 
             const data = this.currentData;
@@ -184,12 +191,8 @@ export default {
 
             this.$axios.post(window.redirectMate.actions.addRedirect, { redirectData: this.currentData })
                 .then(({ data }) => {
-                    console.log('>> data: ', data);
-
                     this.errorMessage = null;
                     this.errors = null;
-
-                    console.log({ saveMode });
 
                     if (saveMode === 'save') {
                         this.closeCallback();
@@ -232,9 +235,9 @@ export default {
     },
 
     mounted() {
-        document.addEventListener('keyup', e => {
+        document.addEventListener('keydown', e => {
             if (e.keyCode === 27) {
-                if (this.isVisible) {
+                if (this.isVisible && !this.hasOpenSelectModal) {
                     this.cancel();
                 }
             }
