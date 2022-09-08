@@ -57,6 +57,9 @@ class CpController extends Controller
 
         if ($search) {
             $query->andFilterWhere(['like', 'sourceUrl', $search]);
+            $query->orFilterWhere(['like', 'referrer', $search]);
+            $query->orFilterWhere(['like', 'remoteIp', $search]);
+            $query->orFilterWhere(['like', 'userAgent', $search]);
         }
         
         $totalCount = $query->count();
