@@ -270,7 +270,7 @@ export default {
                             </td>
                             <td class="break-all">
                                 <span v-if="item.isRegexp">{{ item.destinationUrl }}</span>
-                                <a v-else :href="getItemUrl(item, item.destinationUrl)" class="go" target="_blank" :data-icon="!item.destinationUrl || item.destinationUrl === '/' ? 'home' : false">{{ item.destinationUrl != '/' ? item.destinationUrl : '' }}</a>
+                                <a v-else-if="item.statusCode < 400" :href="getItemUrl(item, item.destinationUrl)" class="go" target="_blank" :data-icon="!item.destinationUrl || item.destinationUrl === '/' ? 'home' : false">{{ item.destinationUrl != '/' ? item.destinationUrl : '' }}</a>
                             </td>
                             <td class="whitespace-nowrap" v-if="sites && sites.length > 1">
                                 {{ getSiteName(item.siteId) }}
