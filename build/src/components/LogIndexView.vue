@@ -193,8 +193,7 @@ export default {
             return `${uaParsed.getBrowser().name} ${uaParsed.getBrowser().major} / ${uaParsed.getOS().name} ${uaParsed.getOS().version}`;
         },
         getItemSourceUrl(item) {
-            const site = this.sites.find( ({ id }) => id === parseInt(item.siteId, 10));
-            return this.Craft.getUrl(item.sourceUrl.substring(1), null, site.baseUrl);
+            return this.Craft.getUrl(item.sourceUrl.substring(1), null, this.getSiteBaseUrl(item.siteId));
         },
         formatDateTime(dateTime) {
             if (!dateTime) {
@@ -213,6 +212,22 @@ export default {
             } else {
                 return Craft.t('redirectmate', 'All sites');
             }
+        },
+        getSiteBaseUrl(siteId) {
+            let site = null;
+            
+            if (siteId) {
+                site = this.sites.find( ({ id }) => id === parseInt(siteId, 10));
+            } 
+            
+            if (!site) {
+                if (this.sites && this.sites.length > 0) {
+                    // FIXME: Get primary site instead
+                    site = this.sites[0];
+                }
+            }
+            
+            return site ? site.baseUrl : null;
         }
     },
 

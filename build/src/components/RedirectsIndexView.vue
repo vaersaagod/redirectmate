@@ -133,14 +133,7 @@ export default {
                 return targetUrl;
             }
 
-            // FIXME: Get primary site instead
-            let site = this.sites[0];
-
-            if (item.siteId !== null) {
-                site = this.sites.find( ({ id }) => id === parseInt(item.siteId, 10));
-            }
-
-            return this.Craft.getUrl(targetUrl.substring(1), null, site.baseUrl);
+            return this.Craft.getUrl(targetUrl.substring(1), null, this.getSiteBaseUrl(item.siteId));
         },
         formatDateTime(dateTime) {
             if (!dateTime) {
@@ -148,6 +141,22 @@ export default {
             }
             const date = new Date(dateTime);
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        },
+        getSiteBaseUrl(siteId) {
+            let site = null;
+            
+            if (siteId) {
+                site = this.sites.find( ({ id }) => id === parseInt(siteId, 10));
+            } 
+            
+            if (!site) {
+                if (this.sites && this.sites.length > 0) {
+                    // FIXME: Get primary site instead
+                    site = this.sites[0];
+                }
+            }
+            
+            return site ? site.baseUrl : null;
         }
 
     },
