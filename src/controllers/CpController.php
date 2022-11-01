@@ -207,6 +207,9 @@ class CpController extends Controller
             case 'hits':
                 $query->orderBy('hits DESC');
                 break;
+            case 'statuscode':
+                $query->orderBy('statusCode DESC');
+                break;
             default:
                 $query->orderBy('dateCreated DESC');
                 break;

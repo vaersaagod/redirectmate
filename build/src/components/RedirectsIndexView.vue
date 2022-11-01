@@ -196,6 +196,7 @@ export default {
                             <option value="newest">{{ Craft.t('redirectmate', 'Newest') }}</option>
                             <option value="hits">{{ Craft.t('redirectmate', 'By hits') }}</option>
                             <option value="lasthit">{{ Craft.t('redirectmate', 'Last hit') }}</option>
+                            <option value="statuscode">{{ Craft.t('redirectmate', 'Status code') }}</option>
                         </select>
                     </div>
 
