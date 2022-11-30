@@ -77,7 +77,7 @@ class RetourMigration extends Migration
 
         if ($this->db->columnExists($tableName, 'siteId')) {
             $select = [
-                ...$columns,
+                ...$select,
                 // These columns only exist for the Craft 3 version
                 'siteId',
                 'MAX(remoteIp) as remoteIp',

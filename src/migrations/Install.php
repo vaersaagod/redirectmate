@@ -46,7 +46,7 @@ class Install extends Migration
             try {
                 (new RetourMigration())->safeUp();
             } catch (\Throwable $e) {
-                Craft::error($e->getMessage(), __METHOD__);
+                Craft::error($e, __METHOD__);
                 $this->safeDown();
                 return false;
             }
