@@ -12,7 +12,6 @@ export default {
     },
     data() {
         return {
-
             isLoading: false,
             hasOpenSelectModal: false,
             isAtEnd: false,
@@ -84,8 +83,10 @@ export default {
             const modal = window.Craft.createElementSelectorModal('craft\\elements\\Entry', {
                 defaultSiteId: this.currentData.site != 'all' ? this.currentData.site : null,
                 onSelect: e => {
-                    const url = new URL(e[0].url);
-                    this.currentData.destinationUrl = url.pathname;
+                    const url = e[0].url;
+                    const selectedElementSiteId = e[0].siteId;
+                    const site = this.sites.find( ({ id }) => id === parseInt(selectedElementSiteId, 10));
+                    this.currentData.destinationUrl = '/' + url.replace(site.baseUrl, '');
                 },
                 onHide: e => {
                     setTimeout(() => {
