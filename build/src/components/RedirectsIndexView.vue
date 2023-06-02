@@ -80,7 +80,6 @@ export default {
         loadItems() {
             this.$axios.post(this.actions.getRedirects, this.serverParams)
                 .then(({ data }) => {
-                    console.log(data);
                     this.totalCount = parseInt(data.count, 10);
                     this.items = data.data;
                 })
@@ -102,11 +101,8 @@ export default {
             this.loadItems();
         },
         batchDeleteItems() {
-            console.log('batchDeleteItems', this.selectedItems);
-
             this.$axios.post(this.actions.deleteRedirects, { ids: this.selectedItems })
                 .then(({ data }) => {
-                    console.log(data);
                     this.selectedItems = [];
                     this.loadItems();
                 })
@@ -162,7 +158,7 @@ export default {
     },
 
     mounted() {
-        console.log('mounted');
+        //console.log('mounted');
 
         const { sites, actions } = window.redirectMate;
 
