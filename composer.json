@@ -2,7 +2,7 @@
     "name": "vaersaagod/redirectmate",
     "description": "Let's politely redirect your URLs, mate!",
     "type": "craft-plugin",
-    "version": "1.0.0-beta.9",
+    "version": "1.0.0",
     "keywords": [
         "craft",
         "cms",
