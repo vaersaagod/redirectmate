@@ -32,13 +32,14 @@ class CpController extends Controller
     public function actionGetLogs(): Response
     {
         $this->requireAcceptsJson();
+        $this->requirePostRequest();
         
-        $limit = $this->request->getParam('perPage', 20);
-        $page = $this->request->getParam('page', 1);
-        $handled = $this->request->getParam('handled', 'all');
-        $site = $this->request->getParam('site', 'all');
-        $sortBy = $this->request->getParam('sortBy', 'hits');
-        $search = $this->request->getParam('search');
+        $limit = $this->request->getBodyParam('perPage', 20);
+        $page = $this->request->getBodyParam('page', 1);
+        $handled = $this->request->getBodyParam('handled', 'all');
+        $site = $this->request->getBodyParam('site', 'all');
+        $sortBy = $this->request->getBodyParam('sortBy', 'hits');
+        $search = $this->request->getBodyParam('search');
 
         $query = TrackerModel::find();
 
@@ -50,7 +51,7 @@ class CpController extends Controller
                 $query->andWhere('handled = ' . ($handled === 'handled' ? '1' : '0'));
             }
         }
-        
+
         if ($site !== 'all') {
             $query->andWhere('siteId = :site', ['site' => $site]);
         }
@@ -91,7 +92,11 @@ class CpController extends Controller
      */
     public function actionCheckLogItem(): Response
     {
-        $id = Craft::$app->getRequest()->getRequiredParam('id');
+
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+        
+        $id = Craft::$app->getRequest()->getRequiredBodyParam('id');
 
         $query = TrackerModel::find()
             ->where('id=:id', ['id' => $id]);
@@ -118,7 +123,11 @@ class CpController extends Controller
      */
     public function actionToggleMuteLogItem(): Response
     {
-        $id = Craft::$app->getRequest()->getRequiredParam('id');
+
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+
+        $id = Craft::$app->getRequest()->getRequiredBodyParam('id');
 
         $query = TrackerModel::find()
             ->where('id=:id', ['id' => $id]);
@@ -140,7 +149,11 @@ class CpController extends Controller
      */
     public function actionDeleteLogItems(): Response
     {
-        $ids = Craft::$app->getRequest()->getParam('ids');
+
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+
+        $ids = Craft::$app->getRequest()->getBodyParam('ids');
         
         if (empty($ids)) {
             return $this->asFailure(Craft::t('redirectmate', 'No log items to delete.'));
@@ -161,6 +174,10 @@ class CpController extends Controller
      */
     public function actionDeleteAllLogItems(): Response
     {
+
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+
         try {
             TrackerHelper::deleteAll();
         } catch (\Throwable $throwable) {
@@ -178,13 +195,14 @@ class CpController extends Controller
     public function actionGetRedirects(): Response
     {
         $this->requireAcceptsJson();
+        $this->requirePostRequest();
         
-        $limit = $this->request->getParam('perPage', 20);
-        $page = $this->request->getParam('page', 1);
-        $site = $this->request->getParam('site', 'all');
-        $sortBy = $this->request->getParam('sortBy', 'newest');
+        $limit = $this->request->getBodyParam('perPage', 20);
+        $page = $this->request->getBodyParam('page', 1);
+        $site = $this->request->getBodyParam('site', 'all');
+        $sortBy = $this->request->getBodyParam('sortBy', 'newest');
 
-        $search = $this->request->getParam('search');
+        $search = $this->request->getBodyParam('search');
 
         $query = RedirectModel::find();
 
@@ -229,7 +247,11 @@ class CpController extends Controller
      */
     public function actionAddRedirect(): Response
     {
-        $data = Craft::$app->getRequest()->getParam('redirectData');
+
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+
+        $data = Craft::$app->getRequest()->getBodyParam('redirectData');
         
         if (isset($data['id'])) {
             $redirectModel = RedirectHelper::getOrCreateModel($data['id']);
@@ -287,6 +309,10 @@ class CpController extends Controller
      */
     public function actionDeleteRedirects(): Response
     {
+
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+
         $ids = Craft::$app->getRequest()->getParam('ids');
         
         if (empty($ids)) {
