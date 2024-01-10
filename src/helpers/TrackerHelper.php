@@ -81,6 +81,10 @@ class TrackerHelper
         $db = Craft::$app->getDb();
 
         $attributes = $trackerModel->getAttributes(null, ['uid', 'dateCreated', 'dateUpdated']);
+
+        if (empty($attributes['sourceUrl'])) {
+            return;
+        }
         
         if (isset($trackerModel->lastHit)) {
             $attributes['lastHit'] = Db::prepareDateForDb($trackerModel->lastHit);
