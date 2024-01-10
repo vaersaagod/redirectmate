@@ -1,6 +1,6 @@
 # RedirectMate Changelog
 
-## 1.0.2 - 2023-09-06
+## 1.0.2 - 2024-01-10
 ### Fixed
 - Fixes a PDO exception for 404 requests where the source URL was empty  
 
