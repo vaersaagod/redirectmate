@@ -41,7 +41,7 @@ class RedirectMateUtility extends Utility
     /**
      * @inheritdoc
      */
-    public static function iconPath(): ?string
+    public static function icon(): ?string
     {
         return Craft::getAlias('@vaersaagod/redirectmate/icon-mask.svg');
     }
@@ -68,7 +68,7 @@ class RedirectMateUtility extends Utility
         }
         
         return Craft::$app->getView()->renderTemplate(
-            'redirectmate/utility/_render',
+            'redirectmate/utility/_render.twig',
             [
                 'settings' => $settings,
             ]

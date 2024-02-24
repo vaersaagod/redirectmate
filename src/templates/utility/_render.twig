@@ -13,15 +13,15 @@
             },
             tabs: tabs|keys|reduce((carry, id) => carry|merge({
                 ("tab--#{id}"): {
-                    tabId: "tab-tab--#{id}",
+                    tabId: "tab-#{id}",
                     label: tabs[id],
-                    url: "#tab--#{id}"
+                    url: "#tab-#{id}"
                 }
             }), {})
         }) }}
     </header>
-    <log-index-view v-if="activeTab === 'tab--log'"></log-index-view>
-    <redirects-index-view v-if="activeTab === 'tab--redirects'"></redirects-index-view>
+    <log-index-view v-if="activeTab === 'tab-log'"></log-index-view>
+    <redirects-index-view v-if="activeTab === 'tab-redirects'"></redirects-index-view>
 </div>
 
 {% set sites = craft.app.getSites().getAllSites() %}

@@ -71,9 +71,6 @@ export default {
                 return;
             }
             this.$nextTick(this.focusToFirstErrorInput);
-        },
-        currentData(newValue) {
-          //console.log({newValue});
         }
     },
     methods: {
