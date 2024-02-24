@@ -1,6 +1,6 @@
 <?php
 /**
- * RedirectMate plugin for Craft CMS 4.x
+ * RedirectMate plugin for Craft CMS 5.x
  *
  * @link      https://www.vaersaagod.no
  * @copyright Copyright (c) 2022 Værsågod
@@ -21,6 +21,7 @@ use craft\utilities\ClearCaches;
 use craft\web\ErrorHandler;
 
 use Psr\Log\LogLevel;
+
 use yii\base\Event;
 use yii\web\HttpException;
 
@@ -49,7 +50,7 @@ class RedirectMate extends Plugin
     /**
      * @var string
      */
-    public string $schemaVersion = '1.1.0';
+    public string $schemaVersion = '2.0.0';
 
     /**
      * @var null|HttpException
