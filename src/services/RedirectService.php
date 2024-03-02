@@ -82,7 +82,7 @@ class RedirectService extends Component
         if (!UrlHelper::isUrl($redirectModel->destinationUrl)) {
             $redirectModel->destinationUrl = UrlHelper::normalizeUrl($redirectModel->destinationUrl, false);
         }
-        
+
         // Check if we already have a redirect with this source URL and site ID, if so, update it.
         $query = RedirectModel::find()
             ->where(['sourceUrl' => $redirectModel->sourceUrl]);
@@ -101,7 +101,6 @@ class RedirectService extends Component
 
         if ($existingRedirect) {
             $redirectModel->id = $existingRedirect->id;
-            $redirectModel->siteId = $existingRedirect->siteId;
         }
 
         // Check if we have any redirects with source URL equal to our destination. This opens up for redirect loops, which we should avoid (?)

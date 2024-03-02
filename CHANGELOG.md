@@ -1,5 +1,9 @@
 # RedirectMate Changelog
 
+## Unreleased
+### Fixed
+- Fixed an issue where it wasn't possible to change the site when editing an existing redirect
+
 ## 1.0.2 - 2024-01-10
 ### Fixed
 - Fixes a PDO exception for 404 requests where the source URL was empty  
