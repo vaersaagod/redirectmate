@@ -114,7 +114,18 @@ class CpController extends Controller
 
         $statusCode = UrlHelper::getUrlStatusCode($url);
 
-        return $this->asSuccess(Craft::t('redirectmate', 'URL checked'), ['id' => $id, 'code' => $statusCode, 'handled' => $statusCode !== 404 ]);
+        $handled = $statusCode !== 404;
+
+        if ($handled !== $trackerModel->handled) {
+            try {
+                $trackerModel->handled = $handled;
+                TrackerHelper::insertOrUpdateTracker($trackerModel);
+            } catch (\Throwable $throwable) {
+                Craft::error($throwable->getMessage(), __METHOD__); // Log it, but... don't really care.
+            }
+        }
+
+        return $this->asSuccess(Craft::t('redirectmate', 'URL checked'), ['id' => $id, 'code' => $statusCode, 'handled' => $handled ]);
     }
 
     /**
