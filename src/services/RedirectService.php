@@ -101,7 +101,6 @@ class RedirectService extends Component
 
         if ($existingRedirect) {
             $redirectModel->id = $existingRedirect->id;
-            $redirectModel->siteId = $existingRedirect->siteId;
         }
 
         // Check if we have any redirects with source URL equal to our destination. This opens up for redirect loops, which we should avoid (?)
