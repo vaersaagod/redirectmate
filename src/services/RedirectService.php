@@ -32,9 +32,9 @@ class RedirectService extends Component
 
         $response = Craft::$app->getResponse();
         $statusCode = $redirect->statusCode;
-        
+
         RedirectHelper::updateRedirectStats($redirect);
-        
+
         // If we have a status code above 400, trigger an exception and let Craft handle it.
         if ($statusCode >= 400) {
             RedirectMate::$currentException->statusCode = $statusCode;
@@ -71,6 +71,7 @@ class RedirectService extends Component
     /**
      * @param RedirectModel $redirectModel
      * @return RedirectModel
+     * @throws \Exception
      */
     public function addRedirect(RedirectModel $redirectModel): RedirectModel
     {
@@ -78,17 +79,21 @@ class RedirectService extends Component
         if (!$redirectModel->isRegexp) {
             $redirectModel->sourceUrl = UrlHelper::normalizeUrl($redirectModel->sourceUrl, false);
         }
-        
+
         if (!UrlHelper::isUrl($redirectModel->destinationUrl)) {
             $redirectModel->destinationUrl = UrlHelper::normalizeUrl($redirectModel->destinationUrl, false);
         }
 
-        // Check if we already have a redirect with this source URL and site ID, if so, update it.
-        $query = RedirectModel::find()
+        // Check if we already have redirects with this source URL and site ID
+        $existingRedirectQuery = RedirectModel::find()
             ->where(['sourceUrl' => $redirectModel->sourceUrl]);
 
-        if ($redirectModel->siteId !== null) {
-            $query->andWhere([
+        if (!empty($redirectModel->id)) {
+            $existingRedirectQuery->andWhere(['!=', 'id', $redirectModel->id]);
+        }
+
+        if (!empty($redirectModel->siteId)) {
+            $existingRedirectQuery->andWhere([
                 'or', [
                     'siteId' => $redirectModel->siteId,
                 ], [
@@ -97,53 +102,72 @@ class RedirectService extends Component
             ]);
         }
 
-        $existingRedirect = $query->one();
-
-        if ($existingRedirect) {
-            $redirectModel->id = $existingRedirect->id;
-        }
-
-        // Check if we have any redirects with source URL equal to our destination. This opens up for redirect loops, which we should avoid (?)
-        $query = RedirectModel::find()
-            ->where(['sourceUrl' => $redirectModel->destinationUrl]);
-
-        if (isset($redirectModel->siteId)) {
-            $query->andWhere([
-                'or', [
-                    'siteId' => $redirectModel->siteId,
-                ], [
-                    'siteId' => null,
-                ]
-            ]);
-        }
-
-        $existingRedirect = $query->one();
-
-        if ($existingRedirect) {
-            try {
-                RedirectHelper::deleteAllByIds([$existingRedirect->id]);
-            } catch (\Throwable $e) {
-                Craft::error('An error occurred when trying to delete potential redirect loop redirects: ', $e->getMessage(), __METHOD__);
+        /** @var RedirectModel $existingRedirect */
+        foreach ($existingRedirectQuery->each() as $existingRedirect) {
+            if ($redirectModel->siteId === $existingRedirect->siteId || $redirectModel->siteId === null) {
+                // The existing redirect should be safe to delete, because the redirect being saved is going to supersede it
+                // Let's retain the existing redirect's stats, though
+                $redirectModel->hits += $existingRedirect->hits;
+                try {
+                    RedirectHelper::deleteAllByIds([$existingRedirect->id]);
+                } catch (\Throwable $e) {
+                    Craft::error('An error occurred when trying to delete redundant existing redirect: ' . $e->getMessage(), __METHOD__);
+                }
             }
         }
-        
-        // Update any existing redirects pointing to the old URI, to avoid additional redirects in cases where an element URI changes multiple times
-        $oldRedirects = RedirectModel::find()
-            ->where(['destinationUrl' => $redirectModel->sourceUrl])
-            ->andWhere([
+
+        // Check if we have any redirects with source URL equal to our destination. This opens up for redirect loops, which we should avoid.
+        $conflictingRedirectQuery = RedirectModel::find()
+            ->where(['sourceUrl' => $redirectModel->destinationUrl]);
+
+        if (!empty($redirectModel->id)) {
+            $conflictingRedirectQuery->andWhere(['!=', 'id', $redirectModel->id]);
+        }
+
+        if (!empty($redirectModel->siteId)) {
+            $conflictingRedirectQuery->andWhere([
                 'or', [
                     'siteId' => $redirectModel->siteId,
                 ], [
                     'siteId' => null,
                 ]
-            ])
-            ->all();
+            ]);
+        }
 
-        foreach ($oldRedirects as $oldRedirect) {
+        /** @var RedirectModel $conflictingRedirect */
+        foreach ($conflictingRedirectQuery->each() as $conflictingRedirect) {
+            try {
+                RedirectHelper::deleteAllByIds([$conflictingRedirect->id]);
+            } catch (\Throwable $e) {
+                Craft::error('An error occurred when trying to delete potential redirect loop redirect: ' . $e->getMessage(), __METHOD__);
+            }
+        }
+
+        // Update any existing redirects pointing to the old URI, to avoid additional redirects in cases where an element URI changes multiple times
+        $oldRedirectsQuery = RedirectModel::find()
+            ->where(['destinationUrl' => $redirectModel->sourceUrl]);
+
+        if (!empty($redirectModel->id)) {
+            $oldRedirectsQuery->andWhere(['!=', 'id', $redirectModel->id]);
+        };
+
+        if (!empty($redirectModel->siteId)) {
+            $oldRedirectsQuery
+                ->andWhere([
+                    'or', [
+                        'siteId' => $redirectModel->siteId,
+                    ], [
+                        'siteId' => null,
+                    ]
+                ]);
+        }
+
+        /** @var RedirectModel $oldRedirect */
+        foreach ($oldRedirectsQuery->each() as $oldRedirect) {
             $oldRedirect->destinationUrl = $redirectModel->destinationUrl;
             RedirectHelper::insertOrUpdateRedirect($oldRedirect);
         }
-        
+
         // Invalidate caches
         CacheHelper::invalidateAllCaches();
 
