@@ -1,5 +1,9 @@
 # RedirectMate Changelog
 
+## Unreleased
+### Improved
+- RedirectMate is now smarter about how conflicting redirects are handled when saving a new redirect, or editing an existing one.
+
 ## 1.0.3 - 2024-03-03
 ### Fixed
 - Fixed an issue where it wasn't possible to change the site when editing an existing redirect  
