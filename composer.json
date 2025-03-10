@@ -2,7 +2,7 @@
     "name": "vaersaagod/redirectmate",
     "description": "Let's politely redirect your URLs, mate!",
     "type": "craft-plugin",
-    "version": "2.0.0-beta.1",
+    "version": "2.0.0",
     "keywords": [
         "craft",
         "cms",
@@ -24,7 +24,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "craftcms/cms": "^5.0.0-beta.3",
+        "craftcms/cms": "^5.0.0",
         "league/csv": "^9.8"
     },
     "require-dev": {
