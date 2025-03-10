@@ -1,6 +1,6 @@
 <?php
 /**
- * RedirectMate plugin for Craft CMS 4.x
+ * RedirectMate plugin for Craft CMS 5.x
  *
  * @link      https://www.vaersaagod.no
  * @copyright Copyright (c) 2022 Værsågod
@@ -14,15 +14,18 @@ use craft\base\Plugin;
 use craft\events\ExceptionEvent;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
+use craft\helpers\App;
 use craft\log\MonologTarget;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
 use craft\web\ErrorHandler;
 
-use vaersaagod\redirectmate\helpers\CacheHelper;
+use Psr\Log\LogLevel;
+
 use yii\base\Event;
 use yii\web\HttpException;
 
+use vaersaagod\redirectmate\helpers\CacheHelper;
 use vaersaagod\redirectmate\models\Settings;
 use vaersaagod\redirectmate\services\ElementUriWatcher;
 use vaersaagod\redirectmate\services\RedirectService;
@@ -47,15 +50,12 @@ class RedirectMate extends Plugin
     /**
      * @var string
      */
-    public string $schemaVersion = '1.1.0';
+    public string $schemaVersion = '2.0.0';
 
     /**
      * @var null|HttpException
      */
     public static ?HttpException $currentException = null;
-
-    // Public Methods
-    // =========================================================================
 
     public function init()
     {
@@ -70,15 +70,19 @@ class RedirectMate extends Plugin
             'elementUriWatcher' => ElementUriWatcher::class,
         ]);
 
-        // Register a custom log target, keeping the format as simple as possible.
-        Craft::getLogger()->dispatcher->targets[] = new MonologTarget([
+        // Custom log target
+        \Craft::getLogger()->dispatcher->targets[] = new MonologTarget([
             'name' => 'redirectmate',
             'categories' => ['redirectmate', 'vaersaagod\\redirectmate\\*'],
-            'allowLineBreaks' => true,
+            'extractExceptionTrace' => !App::devMode(),
+            'allowLineBreaks' => App::devMode(),
+            'level' => App::devMode() ? LogLevel::INFO : LogLevel::WARNING,
+            'logContext' => false,
+            'maxFiles' => 10,
         ]);
 
         // Add utility
-        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
+        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITIES,
             static function (RegisterComponentTypesEvent $event) {
                 $event->types[] = RedirectMateUtility::class;
             }
@@ -123,9 +127,6 @@ class RedirectMate extends Plugin
 
     }
 
-    // Protected Methods
-    // =========================================================================
-
     /**
      * Creates and returns the model used to store the plugin’s settings.
      *
@@ -135,8 +136,5 @@ class RedirectMate extends Plugin
     {
         return new Settings();
     }
-
-    // Private Methods
-    // =========================================================================
 
 }

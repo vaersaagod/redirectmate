@@ -31,12 +31,7 @@ const app = createApp({
     inject: ['$axios', 'Craft', 'Garnish'],
     data() {
         return {
-            activeTab: window.LOCATION_HASH || 'tab--log',
-        }
-    },
-    watch: {
-        activeTab(newTab, oldTab) {
-            console.log({ newTab, oldTab });
+            activeTab: window.LOCATION_HASH || 'tab-log',
         }
     },
     methods: {

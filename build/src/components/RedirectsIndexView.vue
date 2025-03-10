@@ -158,8 +158,6 @@ export default {
     },
 
     mounted() {
-        //console.log('mounted');
-
         const { sites, actions } = window.redirectMate;
 
         if (sites && sites.length) {

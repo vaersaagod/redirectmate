@@ -88,7 +88,6 @@ export default {
                 .then(({ data }) => {
                     this.totalCount = parseInt(data.count, 10);
                     this.items = data.data;
-                    console.log(data, this.totalCount);
                 })
                 .catch(error => {
                     console.error(error);
@@ -118,10 +117,8 @@ export default {
             this.loadItems();
         },
         batchCheckItems() {
-            console.log('batchCheckItems', this.selectedItems);
             this.checkingItems = this.selectedItems;
             this.selectedItems = [];
-
             this.checkNextItem();
         },
         checkNextItem() {
@@ -129,8 +126,6 @@ export default {
 
             this.$axios.post(this.actions.checkLogItem, { id: nextId })
                 .then(({ data }) => {
-                    console.log(data);
-
                     this.updateHandledStatus(nextId, data.handled);
                     this.checkingItems.shift()
 
@@ -154,11 +149,8 @@ export default {
             }
         },
         batchDeleteItems() {
-            console.log('batchDeleteItems', this.selectedItems);
-
             this.$axios.post(this.actions.deleteLogItems, { ids: this.selectedItems })
                 .then(({ data }) => {
-                    console.log(data);
                     this.selectedItems = [];
                     this.loadItems();
                 })
@@ -174,7 +166,6 @@ export default {
         toggleMute(id) {
             this.$axios.post(this.actions.toggleMuteLogItem, { id })
               .then(({ data }) => {
-                  console.log(data);
                   this.loadItems();
               })
               .catch(error => {
@@ -232,8 +223,6 @@ export default {
     },
 
     mounted() {
-        console.log('mounted');
-
         const { sites, actions, settings } = window.redirectMate;
 
         if (sites && sites.length) {
