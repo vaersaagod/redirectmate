@@ -12,7 +12,7 @@
                 id: 'redirectmate-tabs',
             },
             tabs: tabs|keys|reduce((carry, id) => carry|merge({
-                ("tab--#{id}"): {
+                ("tab-#{id}"): {
                     tabId: "tab-#{id}",
                     label: tabs[id],
                     url: "#tab-#{id}"

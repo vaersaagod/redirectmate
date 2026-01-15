@@ -1,5 +1,9 @@
 # RedirectMate Changelog
 
+## 2.0.1 - 2026-01-15
+### Fixed
+- Fixed a JS error that would occur on Craft 5.8.22+
+
 ## 2.0.0 - 2025-03-10
 ### Fixed
 - Fixed a bug where modals did not become visible in Craft 5.6+.
