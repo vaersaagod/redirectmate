@@ -79,6 +79,9 @@ class UrlHelper extends CraftUrlHelper
      */
     public static function normalizeUrl(string $pathOrUrl, ?bool $addTrailingSlashes = null): string
     {
+        // Strip leading or trailing whitespace to avoid index issues
+        $pathOrUrl = preg_replace('/^[\s\x{00A0}]+|[\s\x{00A0}]+$/u', '', $pathOrUrl);
+        
         if ($addTrailingSlashes === null) {
             $addTrailingSlashes = \Craft::$app->getConfig()->getGeneral()->addTrailingSlashesToUrls;
         }
