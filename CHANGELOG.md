@@ -1,5 +1,9 @@
 # RedirectMate Changelog
 
+## 2.0.2 - 2026-07-02
+### Fixed
+- Fixed an issue where trailing whitespace could result in database index collisions.
+
 ## 2.0.1 - 2026-01-15
 ### Fixed
 - Fixed a JS error that would occur on Craft 5.8.22+
