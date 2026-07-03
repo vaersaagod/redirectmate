@@ -129,7 +129,38 @@ class RedirectModel extends Model
         $rules[] = [['isRegexp'], BooleanValidator::class];
         $rules[] = [['dateCreated', 'dateUpdated', 'lastHit'], DateTimeValidator::class];
         $rules[] = [['sourceUrl', 'statusCode', 'matchBy'], 'required'];
+        $rules[] = [['statusCode'], 'in', 'range' => [
+            self::STATUSCODE_301_PERMANENT,
+            self::STATUSCODE_302_TEMPORARY,
+            self::STATUSCODE_307_TEMPORARY_REDIRECT,
+            self::STATUSCODE_308_PERMANENT_REDIRECT,
+            self::STATUSCODE_410_GONE,
+        ]];
+        $rules[] = [['matchBy'], 'in', 'range' => [self::MATCHBY_PATH, self::MATCHBY_FULLURL]];
+        $rules[] = [['destinationUrl'], 'validateDestinationUrl'];
         return $rules;
+    }
+
+    /**
+     * Validates that the destination URL does not use a potentially unsafe scheme.
+     *
+     * Relative paths and http(s)/protocol-relative URLs are allowed; anything carrying another
+     * URI scheme (e.g. "javascript:" or "data:") is rejected.
+     *
+     * @param string $attribute
+     * @return void
+     */
+    public function validateDestinationUrl(string $attribute): void
+    {
+        $value = trim((string)$this->$attribute);
+
+        if ($value === '') {
+            return;
+        }
+
+        if (preg_match('/^[a-z][a-z0-9+.\-]*:/i', $value) === 1 && preg_match('#^https?://#i', $value) !== 1) {
+            $this->addError($attribute, Craft::t('redirectmate', 'The destination URL uses an unsupported scheme.'));
+        }
     }
 
     /**
