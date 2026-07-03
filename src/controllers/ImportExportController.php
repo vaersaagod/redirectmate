@@ -107,6 +107,10 @@ class ImportExportController extends Controller
 
         $csv = Writer::createFromFileObject(new SplTempFileObject());
 
+        // Neutralize spreadsheet formula injection – tracked values (source URL, referrer,
+        // user agent) are attacker-controlled and could otherwise be interpreted as formulas.
+        $csv->addFormatter(new EscapeFormula());
+
         try {
             $csv->setDelimiter(RedirectMate::getInstance()->getSettings()->csvDelimiter);
         } catch (\Throwable $e) {
