@@ -1,5 +1,6 @@
 <script>
 import IndexViewFooter from './includes/IndexViewFooter.vue';
+import { sanitizeUrl } from '../helpers/security.js';
 
 const PER_PAGE_STORAGE_KEY = 'redirectmate:redirects:perPage';
 
@@ -131,6 +132,9 @@ export default {
 
             return this.Craft.getUrl(targetUrl.substring(1), null, this.getSiteBaseUrl(item.siteId));
         },
+        safeUrl(url) {
+            return sanitizeUrl(url);
+        },
         formatDateTime(dateTime) {
             if (!dateTime) {
                 return '';
@@ -257,14 +261,14 @@ export default {
                             </td>
                             <td class="break-all" width="40%">
                                 <span v-if="item.isRegexp">{{ item.sourceUrl }}</span>
-                                <a v-else :href="getItemUrl(item, item.sourceUrl)" class="go" target="_blank">{{ item.sourceUrl }}</a>
+                                <a v-else :href="safeUrl(getItemUrl(item, item.sourceUrl))" class="go" target="_blank">{{ item.sourceUrl }}</a>
                             </td>
                             <td class="whitespace-nowrap">
                                 {{ item.statusCode }}
                             </td>
                             <td class="break-all">
                                 <span v-if="item.isRegexp">{{ item.destinationUrl }}</span>
-                                <a v-else-if="item.statusCode < 400" :href="getItemUrl(item, item.destinationUrl)" class="go" target="_blank" :data-icon="!item.destinationUrl || item.destinationUrl === '/' ? 'home' : false">{{ item.destinationUrl != '/' ? item.destinationUrl : '' }}</a>
+                                <a v-else-if="item.statusCode < 400" :href="safeUrl(getItemUrl(item, item.destinationUrl))" class="go" target="_blank" :data-icon="!item.destinationUrl || item.destinationUrl === '/' ? 'home' : false">{{ item.destinationUrl != '/' ? item.destinationUrl : '' }}</a>
                             </td>
                             <td class="whitespace-nowrap" v-if="sites && sites.length > 1">
                                 {{ getSiteName(item.siteId) }}

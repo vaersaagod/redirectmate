@@ -62,7 +62,13 @@ class TrackerHelper
         }
         
         if (in_array('referrer', $settings->track, true)) {
-            $trackerModel->referrer = $request->getReferrer();
+            $referrer = $request->getReferrer();
+            // Only persist http(s) referrers – dropping other schemes (e.g. "javascript:")
+            // avoids storing values that could be rendered as links in the control panel.
+            if ($referrer !== null && preg_match('#^https?://#i', $referrer) !== 1) {
+                $referrer = null;
+            }
+            $trackerModel->referrer = $referrer;
         }
         
         if (in_array('useragent', $settings->track, true)) {

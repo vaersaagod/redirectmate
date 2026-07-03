@@ -3,6 +3,7 @@ import isbot from 'isbot';
 import UAParser from 'ua-parser-js';
 
 import IndexViewFooter from './includes/IndexViewFooter.vue';
+import { sanitizeUrl } from '../helpers/security.js';
 
 const PER_PAGE_STORAGE_KEY = 'redirectmate:logs:perPage';
 
@@ -186,6 +187,9 @@ export default {
         getItemSourceUrl(item) {
             return this.Craft.getUrl(item.sourceUrl.substring(1), null, this.getSiteBaseUrl(item.siteId));
         },
+        safeUrl(url) {
+            return sanitizeUrl(url);
+        },
         formatDateTime(dateTime) {
             if (!dateTime) {
                 return '';
@@ -326,7 +330,7 @@ export default {
                           </td>
                           <td class="break-all" width="40%">
                               <span class="status-dot inline-block w-10px h-10px rounded-100 mr-10" :class="{ 'bg-green-600': logItem.handled || newlyHandledItems.includes(logItem.id), 'bg-red-600': !logItem.handled && !newlyHandledItems.includes(logItem.id), 'is-checking': checkingItems.includes(logItem.id) }" :title="logItem.handled ? Craft.t('redirectmate', 'Handled') : Craft.t('redirectmate', 'Not handled')"></span>
-                              <a :href="getItemSourceUrl(logItem)" class="go" target="_blank">{{ logItem.sourceUrl }}</a>
+                              <a :href="safeUrl(getItemSourceUrl(logItem))" class="go" target="_blank">{{ logItem.sourceUrl }}</a>
                           </td>
                           <td>
                               <div class="text-right">
@@ -351,7 +355,7 @@ export default {
 
                           </td>
                           <td v-if="trackingEnabled('referrer')">
-                              <a :href="logItem.referrer" v-if="logItem.referrer != null" class="inline-flex go gap-0"><span class="inline-block max-w-[180px] truncate" :title="logItem.referrer">{{ logItem.referrer }}</span></a>
+                              <a :href="safeUrl(logItem.referrer)" v-if="logItem.referrer != null" class="inline-flex go gap-0"><span class="inline-block max-w-[180px] truncate" :title="logItem.referrer">{{ logItem.referrer }}</span></a>
                           </td>
                           <td>
                               <button type="button" @click="toggleMute(logItem.id)" class="btn small">{{ Craft.t('redirectmate', logItem.enabled ? 'Mute' : 'Unmute') }}</button>

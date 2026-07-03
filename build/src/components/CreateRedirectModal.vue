@@ -1,4 +1,6 @@
 <script>
+import { sanitizeUrl, escapeHtml } from '../helpers/security.js';
+
 export default {
     inject: ['$axios', 'Craft'],
     props: {
@@ -208,10 +210,18 @@ export default {
 
                     this.isLoading = false;
 
+                    // The saved source URL is derived from untrusted request data, so escape it
+                    // for the HTML `details` and drop the link entirely if the scheme is unsafe.
+                    const safeSourceUrl = sanitizeUrl(data.sourceUrl);
+                    const sourceUrlLabel = escapeHtml(data.sourceUrl);
+                    const successDetails = safeSourceUrl
+                        ? `<a href="${escapeHtml(safeSourceUrl)}" class="go break-all" target="_blank" rel="noopener noreferrer">${sourceUrlLabel}</a>`
+                        : sourceUrlLabel;
+
                     window.Craft.cp.displaySuccess(
                         Craft.t('redirectmate', 'Redirect saved.'),
                         {
-                            details: `<a href="${data.sourceUrl}" class="go break-all" target="_blank" rel="noopener noreferrer">${data.sourceUrl}</a>`
+                            details: successDetails
                         }
                     );
 
