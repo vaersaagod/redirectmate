@@ -6,6 +6,7 @@ use Craft;
 use craft\db\Query;
 use craft\web\Controller;
 
+use League\Csv\EscapeFormula;
 use League\Csv\Writer;
 
 use SplTempFileObject;
@@ -13,9 +14,32 @@ use SplTempFileObject;
 use vaersaagod\redirectmate\db\RedirectQuery;
 use vaersaagod\redirectmate\db\TrackerQuery;
 use vaersaagod\redirectmate\RedirectMate;
+use vaersaagod\redirectmate\utilities\RedirectMateUtility;
 
 class ImportExportController extends Controller
 {
+
+    // Public Methods
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     * @throws \yii\web\BadRequestHttpException
+     * @throws \yii\web\ForbiddenHttpException
+     */
+    public function beforeAction($action): bool
+    {
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+
+        // Exports contain all tracked 404 data (incl. IPs, user agents, referrers) and every
+        // redirect – restrict them to control panel users with access to the RedirectMate utility.
+        $this->requireCpRequest();
+        $this->requirePermission('utility:' . RedirectMateUtility::id());
+
+        return true;
+    }
 
     /**
      * @return void

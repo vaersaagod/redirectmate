@@ -11,6 +11,7 @@ use vaersaagod\redirectmate\helpers\UrlHelper;
 use vaersaagod\redirectmate\models\RedirectModel;
 use vaersaagod\redirectmate\models\TrackerModel;
 use vaersaagod\redirectmate\RedirectMate;
+use vaersaagod\redirectmate\utilities\RedirectMateUtility;
 
 use yii\web\Response;
 
@@ -24,6 +25,25 @@ class CpController extends Controller
 
     // Public Methods
     // =========================================================================
+
+    /**
+     * @inheritdoc
+     * @throws \yii\web\BadRequestHttpException
+     * @throws \yii\web\ForbiddenHttpException
+     */
+    public function beforeAction($action): bool
+    {
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+
+        // These actions read PII, mutate redirects and delete data – restrict them to
+        // control panel requests from users with access to the RedirectMate utility.
+        $this->requireCpRequest();
+        $this->requirePermission('utility:' . RedirectMateUtility::id());
+
+        return true;
+    }
 
     /**
      * @return Response
