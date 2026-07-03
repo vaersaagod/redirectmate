@@ -1,5 +1,9 @@
 # RedirectMate Changelog
 
+## 1.0.4 - 2026-07-03
+### Fixed
+- Fixed a SQL injection vulnerability where the requested URL was interpolated into the redirect lookup's ORDER BY clause.
+
 ## 1.0.3 - 2024-03-03
 ### Fixed
 - Fixed an issue where it wasn't possible to change the site when editing an existing redirect  
