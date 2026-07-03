@@ -63,8 +63,20 @@ class RedirectHelper
             $parsedUrlModel->path
         ];
 
+        // Bind the URL patterns as query params rather than concatenating them into the
+        // ORDER BY expression – $urlPatterns is derived from the (attacker-controlled) request
+        // URL, so raw interpolation here is a SQL injection vector.
+        $fieldPlaceholders = [];
+        $fieldParams = [];
+
+        foreach (array_values($urlPatterns) as $i => $urlPattern) {
+            $placeholder = ":rmField$i";
+            $fieldPlaceholders[] = $placeholder;
+            $fieldParams[$placeholder] = $urlPattern;
+        }
+
         $redirect = RedirectModel::find()
-            ->orderBy(new Expression('FIELD (sourceUrl, \'' . implode('\',\'', $urlPatterns) . '\')'))
+            ->orderBy(new Expression('FIELD(sourceUrl, ' . implode(', ', $fieldPlaceholders) . ')', $fieldParams))
             ->where([
                 'or', [
                     'siteId' => $site->id,
