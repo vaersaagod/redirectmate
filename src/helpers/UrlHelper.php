@@ -57,9 +57,19 @@ class UrlHelper extends CraftUrlHelper
 
     public static function getUrlStatusCode($url): int
     {
+        // Only ever fetch http(s) URLs, and constrain redirects to the same, to avoid this
+        // being abused as a server-side request forgery primitive (e.g. file:// or gopher://).
+        if (preg_match('#^https?://#i', (string)$url) !== 1) {
+            return 0;
+        }
+
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
+        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
+        curl_setopt($ch, CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         curl_setopt($ch, CURLOPT_USERAGENT, self::REDIRECTMATE_BOT_USER_AGENT);
         $output = curl_exec($ch);
