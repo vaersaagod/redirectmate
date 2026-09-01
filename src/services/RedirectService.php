@@ -52,8 +52,8 @@ class RedirectService extends Component
         $siteId = $redirect->siteId ?? Craft::$app->getSites()->getCurrentSite()->siteId ?? null;
         $destinationUrl = $redirect->destinationUrl ?? '';
 
-        if (RedirectMate::getInstance()?->getSettings()->queryStringPassthrough && !empty(Craft::$app->getRequest()->getQueryString())) {
-            $destinationUrl = UrlHelper::siteUrl($destinationUrl, Craft::$app->getRequest()->getQueryString(), null, $siteId);
+        if (RedirectMate::getInstance()?->getSettings()->queryStringPassthrough && !empty(Craft::$app->getRequest()->getQueryStringWithoutPath())) {
+            $destinationUrl = UrlHelper::siteUrl($destinationUrl, Craft::$app->getRequest()->getQueryStringWithoutPath(), null, $siteId);
         } else {
             $destinationUrl = UrlHelper::siteUrl($destinationUrl, null, null, $siteId);
         }
