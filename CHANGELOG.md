@@ -1,5 +1,9 @@
 # RedirectMate Changelog
 
+## 2.1.1 - 2026-09-01
+### Fixed
+- Fixed an issue where query string passthrough would keep the page parameter.
+
 ## 2.1.0 - 2026-07-04
 ### Fixed
 - Fixed a SQL injection vulnerability where the requested URL was  interpolated into the redirect lookup's ORDER BY clause.
