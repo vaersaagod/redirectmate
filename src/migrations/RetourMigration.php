@@ -208,7 +208,8 @@ class RetourMigration extends Migration
                 $destinationElementId = (new Query())
                     ->select('id')
                     ->from(Table::ELEMENTS)
-                    ->scalar();
+                    ->where(['id' => $destinationElementId])
+                    ->scalar() ?: null;
             } else {
                 $destinationElementId = null;
             }
