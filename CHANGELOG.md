@@ -1,5 +1,11 @@
 # RedirectMate Changelog
 
+## 2.1.2 - 2026-09-22
+### Fixed
+- Fixed an issue where regexp redirects whose destination matched their own source could result in endless redirect loops.
+- Fixed an issue where redirects could redirect a request to itself.
+- Fixed an issue where the Retour migration would set the same destination element on all migrated redirects.
+
 ## 2.1.1 - 2026-09-01
 ### Fixed
 - Fixed an issue where query string passthrough would keep the page parameter.
