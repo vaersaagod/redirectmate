@@ -1,5 +1,16 @@
 # RedirectMate Changelog
 
+## Unreleased
+### Fixed
+- Fixed an issue where invisible characters like zero-width spaces could result in database index collisions.
+- Fixed an issue where control characters like line breaks and null bytes in URLs would be stored in the database.
+- Fixed an issue where URLs with invalid UTF-8 sequences couldn't be stored in the database.
+- Fixed an issue where composed and decomposed characters (e.g. "é") would be treated as different URLs.
+- Fixed an issue where paths with ".." or "." segments could be normalized to a relative path.
+- Fixed an issue where 404s for URLs longer than 255 characters couldn't be tracked.
+- Fixed an issue where a plus sign in the requested URL would be treated as a space.
+- Fixed an issue where an encoded question mark in the requested URL would be treated as the start of the query string.
+
 ## 2.1.2 - 2026-09-22
 ### Fixed
 - Fixed an issue where regexp redirects whose destination matched their own source could result in endless redirect loops.
