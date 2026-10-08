@@ -21,6 +21,8 @@ class TrackerHelper
      */
     public static function getOrCreateModel(string $sourceUrl, Site $site): TrackerModel
     {
+        // Truncate to the column length, so that the lookup and the insert use the same value
+        $sourceUrl = mb_substr($sourceUrl, 0, 255);
 
         $existingTrackerModel = TrackerModel::find()
             ->where(['sourceUrl' => $sourceUrl, 'siteId' => $site->id])

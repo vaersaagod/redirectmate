@@ -26,7 +26,9 @@ class UrlHelper extends CraftUrlHelper
         $settings = RedirectMate::getInstance()->getSettings();
 
         $urlModel = new ParsedUrlModel();
-        $urlModel->url = $urlModel->parsedUrl = self::normalizeUrl(self::stripQueryString(urldecode($request->getAbsoluteUrl())), false);
+        // Strip the query string before decoding, so that an encoded question mark in the path isn't mistaken for one.
+        // Use rawurldecode, since a plus sign in a path is a literal plus sign, not an encoded space.
+        $urlModel->url = $urlModel->parsedUrl = self::normalizeUrl(rawurldecode(self::stripQueryString($request->getAbsoluteUrl())), false);
         $urlModel->path = $urlModel->parsedPath = self::normalizeUrl($request->getPathInfo(), false);
         $urlModel->queryString = urldecode($request->getQueryStringWithoutPath());
 
@@ -89,13 +91,30 @@ class UrlHelper extends CraftUrlHelper
      */
     public static function normalizeUrl(string $pathOrUrl, ?bool $addTrailingSlashes = null): string
     {
-        // Strip leading or trailing whitespace to avoid index issues
-        $pathOrUrl = preg_replace('/^[\s\x{00A0}]+|[\s\x{00A0}]+$/u', '', $pathOrUrl);
+        // Replace invalid UTF-8 sequences, since they can't be stored in the database
+        if (!mb_check_encoding($pathOrUrl, 'UTF-8')) {
+            $substituteCharacter = mb_substitute_character();
+            mb_substitute_character(0xFFFD);
+            $pathOrUrl = mb_scrub($pathOrUrl, 'UTF-8');
+            mb_substitute_character($substituteCharacter);
+        }
+
+        // Normalize to NFC, so that composed and decomposed characters (e.g. "é") result in the same string
+        $pathOrUrl = \Normalizer::normalize($pathOrUrl, \Normalizer::FORM_C) ?: $pathOrUrl;
+
+        // Strip control characters (null bytes, line breaks etc.), invisible format characters (zero-width spaces, BOMs etc.)
+        // and leading or trailing whitespace to avoid index issues
+        $pathOrUrl = preg_replace('/[\p{Cc}\p{Cf}]+/u', '', $pathOrUrl) ?? $pathOrUrl;
+        $pathOrUrl = preg_replace('/^[\s\p{Z}]+|[\s\p{Z}]+$/u', '', $pathOrUrl) ?? $pathOrUrl;
         
         if ($addTrailingSlashes === null) {
             $addTrailingSlashes = \Craft::$app->getConfig()->getGeneral()->addTrailingSlashesToUrls;
         }
         
+        if ($pathOrUrl === '') {
+            return $addTrailingSlashes ? '/' : '';
+        }
+
         if ($pathOrUrl === '/') {
             return $pathOrUrl;
         }
@@ -104,6 +123,15 @@ class UrlHelper extends CraftUrlHelper
             $r = rtrim($pathOrUrl, '/');
         } else {
             $r = FileHelper::normalizePath('/'.ltrim($pathOrUrl, '/'), '/');
+
+            // FileHelper turns ".." segments past the root into a relative path (e.g. "/../foo" => "foo", "/.." => "."),
+            // so drop any leftover dot segments and make sure the path is root relative
+            $segments = array_filter(explode('/', $r), static fn(string $segment) => !in_array($segment, ['', '.', '..'], true));
+            $r = '/'.implode('/', $segments);
+
+            if ($r === '/') {
+                return $r;
+            }
         }
 
         return $r.($addTrailingSlashes ? '/' : '');
